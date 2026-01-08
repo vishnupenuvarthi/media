@@ -29,19 +29,11 @@ export const router = createBrowserRouter([
       },
       { 
         path: 'calendar', 
-        element: (
-          <RequireAuth>
-            <CalendarPage />
-          </RequireAuth>
-        ) 
+        element: <CalendarPage />
       },
       { 
         path: 'youtube', 
-        element: (
-          <RequireAuth>
-            <YouTubePage />
-          </RequireAuth>
-        ) 
+        element: <YouTubePage />
       },
       { 
         path: 'breaking', 
