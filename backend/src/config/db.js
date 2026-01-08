@@ -14,14 +14,13 @@ const connectWithRetry = async () => {
       maxPoolSize: 10,
       retryWrites: true,
       w: 'majority',
-      // SSL/TLS options for MongoDB Atlas
-      ssl: true,
-      sslValidate: true,
       // Additional connection options for better compatibility
       connectTimeoutMS: 30000,
       heartbeatFrequencyMS: 10000,
       // Retry connection options
       retryReads: true
+      // Note: SSL/TLS is automatically handled by MongoDB Atlas connection string (mongodb+srv://)
+      // No need to set ssl or sslValidate options explicitly
     };
 
     const conn = await mongoose.connect(env.mongoUri, options);
