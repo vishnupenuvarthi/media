@@ -64,42 +64,42 @@ export const CategoryPage = () => {
   const allStories = data.featured ? [data.featured, ...(data.latest || [])] : (data.latest || []);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12 space-y-10">
-      <header className="space-y-3 border-b border-gray-200 pb-6">
-        <p className="text-xs uppercase tracking-[0.5em] text-primary">{translateCategory(language, data.category.title)}</p>
-        <h1 className="text-4xl font-serif">{translateCategory(language, data.category.title)}</h1>
-        <p className="text-gray-600 text-lg">{translateCategory(language, data.category.description)}</p>
+    <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-8 lg:py-12 space-y-6 sm:space-y-8 lg:space-y-10">
+      <header className="space-y-2 sm:space-y-3 border-b border-gray-200 pb-4 sm:pb-6">
+        <p className="text-[10px] sm:text-xs uppercase tracking-[0.4em] sm:tracking-[0.5em] text-primary">{translateCategory(language, data.category.title)}</p>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold">{translateCategory(language, data.category.title)}</h1>
+        <p className="text-gray-600 text-sm sm:text-base lg:text-lg">{translateCategory(language, data.category.description)}</p>
       </header>
 
       {data.featured && (
-        <article className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <article className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 border border-gray-100 shadow-sm">
           <Link to={`/article/${data.featured.slug}`} className="group">
-            <div className="grid md:grid-cols-[1.5fr_1fr] gap-6">
-              <div className="overflow-hidden rounded-xl bg-gray-100">
+            <div className="grid md:grid-cols-[1.5fr_1fr] gap-4 sm:gap-6">
+              <div className="overflow-hidden rounded-lg sm:rounded-xl bg-gray-100">
                 {data.featured.heroImage ? (
                   <img
                     src={data.featured.heroImage}
                     alt={data.featured.title}
-                    className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-48 sm:h-64 lg:h-80 object-cover group-hover:scale-105 transition-transform duration-500"
                     onError={(e) => {
                       e.currentTarget.src = 'https://via.placeholder.com/800x400/4A5568/FFFFFF?text=News';
                     }}
                   />
                 ) : (
-                  <div className="w-full h-80 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                    <span className="text-gray-400">No Image Available</span>
+                  <div className="w-full h-48 sm:h-64 lg:h-80 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                    <span className="text-gray-400 text-sm sm:text-base">No Image Available</span>
                   </div>
                 )}
               </div>
-              <div className="flex flex-col justify-center space-y-4">
-                <p className="text-xs uppercase tracking-[0.4em] text-primary">Featured Story</p>
-                <h2 className="text-3xl font-serif font-bold leading-tight group-hover:text-primary transition">
+              <div className="flex flex-col justify-center space-y-3 sm:space-y-4">
+                <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] text-primary">Featured Story</p>
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-serif font-bold leading-tight group-hover:text-primary transition">
                   {data.featured.title}
                 </h2>
                 {data.featured.summary && (
-                  <p className="text-gray-600 line-clamp-4">{data.featured.summary}</p>
+                  <p className="text-sm sm:text-base text-gray-600 line-clamp-3 sm:line-clamp-4">{data.featured.summary}</p>
                 )}
-                <div className="flex items-center gap-2 text-sm text-gray-500">
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500">
                   <time>{dayjs(data.featured.publishedAt).format('MMM D, YYYY · h:mm A')}</time>
                 </div>
               </div>
@@ -108,21 +108,21 @@ export const CategoryPage = () => {
         </article>
       )}
 
-      <section className="space-y-6">
-        <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+      <section className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 border-b border-gray-200 pb-3">
           <div>
-            <h2 className="text-2xl font-serif font-bold">{t('latestArticles') || 'Latest Articles'}</h2>
-            <p className="text-sm text-gray-500 mt-1">{t('showingResults') || `Showing ${allStories.length} ${allStories.length === 1 ? 'article' : 'articles'}`}</p>
+            <h2 className="text-xl sm:text-2xl font-serif font-bold">{t('latestArticles') || 'Latest Articles'}</h2>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">{t('showingResults') || `Showing ${allStories.length} ${allStories.length === 1 ? 'article' : 'articles'}`}</p>
           </div>
           <div className="flex items-center gap-2">
-            <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full">
+            <span className="px-2 sm:px-3 py-1 bg-primary/10 text-primary text-[10px] sm:text-xs font-semibold rounded-full">
               {language === 'en' ? 'English' : 'తెలుగు'}
             </span>
           </div>
         </div>
         
         {data.latest && data.latest.length > 0 ? (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
             {data.latest.map((story) => (
               <Link 
                 key={story.id} 

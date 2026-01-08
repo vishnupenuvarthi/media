@@ -49,14 +49,15 @@ export const BreakingNewsPage = () => {
 
   return (
     <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-red-900/30 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6 lg:py-8">
         {/* Professional Horizontal Breaking News Ticker */}
-        <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-red-900/40 shadow-2xl border-b-2 border-yellow-400/30 overflow-hidden mb-8">
-          <div className="flex items-center min-h-[60px]">
+        <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-red-900/40 shadow-2xl border-b-2 border-yellow-400/30 overflow-hidden mb-4 sm:mb-6 lg:mb-8 rounded-lg sm:rounded-xl">
+          <div className="flex items-center min-h-[50px] sm:min-h-[60px]">
             {/* BREAKING NEWS Label */}
-            <div className="flex-shrink-0 flex items-center gap-2 bg-gray-900/80 px-6 py-4 text-yellow-400 font-bold uppercase tracking-[0.3em] text-sm whitespace-nowrap border-r border-gray-700">
-              <MegaphoneIcon className="w-5 h-5 text-yellow-400" />
-              <span>{t('label') || 'BREAKING NEWS'}</span>
+            <div className="flex-shrink-0 flex items-center gap-1 sm:gap-2 bg-gray-900/80 px-3 sm:px-4 lg:px-6 py-2 sm:py-3 lg:py-4 text-yellow-400 font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em] text-xs sm:text-sm whitespace-nowrap border-r border-gray-700">
+              <MegaphoneIcon className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
+              <span className="hidden sm:inline">{t('label') || 'BREAKING NEWS'}</span>
+              <span className="sm:hidden">BREAKING</span>
             </div>
 
             {/* Horizontal Headlines - Evenly Spaced */}
@@ -71,13 +72,13 @@ export const BreakingNewsPage = () => {
                   <Link
                     key={article.id}
                     to={`/article/${article.slug}`}
-                    className="group flex-shrink-0 flex items-center h-full px-6 hover:bg-gray-800/30 transition-colors"
+                    className="group flex-shrink-0 flex items-center h-full px-3 sm:px-4 lg:px-6 hover:bg-gray-800/30 transition-colors"
                   >
-                    <span className="text-white text-sm font-medium whitespace-nowrap group-hover:text-yellow-300 transition-colors">
+                    <span className="text-white text-xs sm:text-sm font-medium whitespace-nowrap group-hover:text-yellow-300 transition-colors">
                       {article.title}
                     </span>
                     {index < articles.length - 1 && (
-                      <span className="h-5 w-px bg-gray-600/50 mx-6 flex-shrink-0" />
+                      <span className="h-4 sm:h-5 w-px bg-gray-600/50 mx-3 sm:mx-4 lg:mx-6 flex-shrink-0" />
                     )}
                   </Link>
                 ))}
@@ -87,14 +88,14 @@ export const BreakingNewsPage = () => {
         </div>
 
         {/* Detailed Breaking News Articles Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
           {articles.map((article) => (
             <Link
               key={article.id}
               to={`/article/${article.slug}`}
               className="group bg-white/10 backdrop-blur-sm rounded-xl border border-gray-700/50 hover:bg-white/20 hover:border-yellow-400/50 transition-all duration-300 overflow-hidden"
             >
-              <div className="relative h-48 overflow-hidden bg-gray-100">
+              <div className="relative h-40 sm:h-48 lg:h-56 overflow-hidden bg-gray-100">
                 {article.heroImage ? (
                   <>
                     <img
@@ -105,31 +106,31 @@ export const BreakingNewsPage = () => {
                         e.currentTarget.src = 'https://via.placeholder.com/400x300/4A5568/FFFFFF?text=Breaking+News';
                       }}
                     />
-                    <div className="absolute top-3 left-3 px-3 py-1 bg-red-600 text-white text-xs font-bold uppercase tracking-wide rounded">
+                    <div className="absolute top-2 left-2 sm:top-3 sm:left-3 px-2 sm:px-3 py-0.5 sm:py-1 bg-red-600 text-white text-[10px] sm:text-xs font-bold uppercase tracking-wide rounded">
                       Breaking
                     </div>
                   </>
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                    <span className="text-gray-400 text-sm">No Image</span>
+                    <span className="text-gray-400 text-xs sm:text-sm">No Image</span>
                   </div>
                 )}
               </div>
-              <div className="p-5">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs uppercase tracking-[0.3em] text-yellow-400 font-semibold">
+              <div className="p-3 sm:p-4 lg:p-5">
+                <div className="flex items-center gap-1.5 sm:gap-2 mb-2 flex-wrap">
+                  <span className="text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-yellow-400 font-semibold">
                     {translateCategory(language, article.category)}
                   </span>
-                  <span className="text-xs text-gray-400">·</span>
-                  <time className="text-xs text-gray-400">
+                  <span className="text-[10px] sm:text-xs text-gray-400 hidden sm:inline">·</span>
+                  <time className="text-[10px] sm:text-xs text-gray-400">
                     {dayjs(article.publishedAt).format('MMM D, h:mm A')}
                   </time>
                 </div>
-                <h3 className="font-serif text-lg font-bold leading-tight text-white group-hover:text-yellow-300 transition mb-2 line-clamp-2">
+                <h3 className="font-serif text-base sm:text-lg font-bold leading-tight text-white group-hover:text-yellow-300 transition mb-2 line-clamp-2">
                   {article.title}
                 </h3>
                 {article.summary && (
-                  <p className="text-sm text-gray-300 line-clamp-2">{article.summary}</p>
+                  <p className="text-xs sm:text-sm text-gray-300 line-clamp-2">{article.summary}</p>
                 )}
               </div>
             </Link>

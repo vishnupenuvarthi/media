@@ -63,13 +63,13 @@ export const HomePage = () => {
   }
 
   return (
-    <div className="space-y-10 pb-12">
+    <div className="space-y-6 sm:space-y-8 lg:space-y-10 pb-6 sm:pb-8 lg:pb-12">
       <HeroSection stories={data.hero || []} />
-      <div className="max-w-6xl mx-auto px-4 grid lg:grid-cols-[2fr_0.8fr] gap-8">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 grid lg:grid-cols-[2fr_0.8fr] gap-4 sm:gap-6 lg:gap-8">
         <SectionStack sections={data.sections || data.categorySections || []} />
         <TrendingSidebar stories={data.trending || []} />
       </div>
-      <div className="max-w-6xl mx-auto px-4 space-y-10">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 space-y-6 sm:space-y-8 lg:space-y-10">
         <SectionStack sections={data.categorySections || []} />
         <LatestFeed stories={data.latest || []} />
         <CalendarSection events={data.calendar || []} />
