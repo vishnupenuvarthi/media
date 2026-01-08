@@ -127,7 +127,9 @@ if (process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID && process.env.APPL
               // Try to find user by oauthId instead
             }
             
+            console.log('Apple OAuth profile received:', { id: userProfile.id, email: userProfile.email, name: userProfile.name });
             const authData = await findOrCreateOAuthUser('apple', userProfile);
+            console.log('Apple OAuth user created/found:', { userId: authData.user.id, email: authData.user.email });
             done(null, { provider: 'apple', ...authData });
           } catch (error) {
             console.error('Apple OAuth error:', error);
@@ -182,7 +184,9 @@ if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
               return done(new Error('Email not provided by Microsoft'), null);
             }
             
+            console.log('Microsoft OAuth profile received:', { id: userProfile.id, email: userProfile.email, name: userProfile.name });
             const authData = await findOrCreateOAuthUser('microsoft', userProfile);
+            console.log('Microsoft OAuth user created/found:', { userId: authData.user.id, email: authData.user.email });
             done(null, { provider: 'microsoft', ...authData });
           } catch (error) {
             console.error('Microsoft OAuth error:', error);

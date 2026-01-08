@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { translate } from '@/utils/translator';
 import { EyeIcon, EyeSlashIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { getBackendUrl } from '@/utils/getBackendUrl';
 
 export const LoginPage = () => {
   const [form, setForm] = useState({ email: '', password: '' });
@@ -115,10 +116,20 @@ export const LoginPage = () => {
             <div className="mb-6 space-y-3">
               <button
                 type="button"
-                onClick={() => {
-                  window.location.href = '/api/auth/google';
+                onClick={async () => {
+                  try {
+                    const backendUrl = getBackendUrl();
+                    const oauthUrl = `${backendUrl}/api/auth/google`;
+                    console.log('Redirecting to Google OAuth:', oauthUrl);
+                    // Direct redirect - OAuth must go to backend, not through proxy
+                    window.location.href = oauthUrl;
+                  } catch (err) {
+                    console.error('OAuth error:', err);
+                    setError('Failed to initiate Google sign-in. Please check backend is running and OAuth is configured.');
+                  }
                 }}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!oauthStatus.google}
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-primary/50 transition font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -130,10 +141,19 @@ export const LoginPage = () => {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  window.location.href = '/api/auth/apple';
+                onClick={async () => {
+                  try {
+                    const backendUrl = getBackendUrl();
+                    const oauthUrl = `${backendUrl}/api/auth/apple`;
+                    console.log('Redirecting to Apple OAuth:', oauthUrl);
+                    window.location.href = oauthUrl;
+                  } catch (err) {
+                    console.error('OAuth error:', err);
+                    setError('Failed to initiate Apple sign-in. Please check backend is running and OAuth is configured.');
+                  }
                 }}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!oauthStatus.apple}
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-primary/50 transition font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
@@ -142,10 +162,19 @@ export const LoginPage = () => {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  window.location.href = '/api/auth/microsoft';
+                onClick={async () => {
+                  try {
+                    const backendUrl = getBackendUrl();
+                    const oauthUrl = `${backendUrl}/api/auth/microsoft`;
+                    console.log('Redirecting to Microsoft OAuth:', oauthUrl);
+                    window.location.href = oauthUrl;
+                  } catch (err) {
+                    console.error('OAuth error:', err);
+                    setError('Failed to initiate Microsoft sign-in. Please check backend is running and OAuth is configured.');
+                  }
                 }}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!oauthStatus.microsoft}
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-primary/50 transition font-medium text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg className="w-5 h-5" viewBox="0 0 23 23" fill="none">
                   <path fill="#F25022" d="M0 0h11v11H0z"/>
