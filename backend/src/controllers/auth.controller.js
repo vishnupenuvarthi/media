@@ -14,7 +14,7 @@ export const register = asyncHandler(async (req, res) => {
     
     res.status(201).json({
       success: true,
-      message: 'Account created successfully! Welcome to Bharat Bulletin.',
+      message: 'Account created successfully! Welcome to NLR LIVE NEWS.',
       ...result
     });
   } catch (error) {

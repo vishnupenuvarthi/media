@@ -2,43 +2,44 @@ import { ArticleModel } from '../models/article.model.js';
 
 export const ArticleService = {
   listHero: async (language = 'te') => {
-    // Show all published articles, prioritize top headlines
-    // EXCLUDE breaking news from hero section
-    // STRICT language filtering for Telugu
-    const query = { 
-      status: 'published',
-      $or: [
-        { 'flags.isBreaking': { $ne: true } },
-        { 'flags.isBreaking': { $exists: false } },
-        { 'flags': { $exists: false } }
-      ]
-    };
-    
-    // For Telugu, only show Telugu articles (strict)
-    if (language === 'te') {
-      query.language = 'te';
-    } else {
-      // For English, show English or universal
-      query.$and = [
-        {
-          $or: [
-            { 'flags.isBreaking': { $ne: true } },
-            { 'flags.isBreaking': { $exists: false } },
-            { 'flags': { $exists: false } }
-          ]
-        },
-        {
-          $or: [
-            { language: 'en' },
-            { language: { $exists: false } },
-            { language: null }
-          ]
-        }
-      ];
-      delete query.$or;
-    }
-    
-    const articles = await ArticleModel.find(query)
+    try {
+      // Show all published articles, prioritize top headlines
+      // EXCLUDE breaking news from hero section
+      // STRICT language filtering for Telugu
+      const query = { 
+        status: 'published',
+        $or: [
+          { 'flags.isBreaking': { $ne: true } },
+          { 'flags.isBreaking': { $exists: false } },
+          { 'flags': { $exists: false } }
+        ]
+      };
+      
+      // For Telugu, only show Telugu articles (strict)
+      if (language === 'te') {
+        query.language = 'te';
+      } else {
+        // For English, show English or universal
+        query.$and = [
+          {
+            $or: [
+              { 'flags.isBreaking': { $ne: true } },
+              { 'flags.isBreaking': { $exists: false } },
+              { 'flags': { $exists: false } }
+            ]
+          },
+          {
+            $or: [
+              { language: 'en' },
+              { language: { $exists: false } },
+              { language: null }
+            ]
+          }
+        ];
+        delete query.$or;
+      }
+      
+      const articles = await ArticleModel.find(query)
       .sort({ 
         'flags.isTopHeadline': -1,
         publishedAt: -1 
@@ -48,11 +49,15 @@ export const ArticleService = {
       .populate('author', 'profile.name')
       .populate('category', 'title slug')
       .lean();
-    
-    // Double-check: Filter out breaking news
-    const nonBreaking = articles.filter(a => !(a.flags && a.flags.isBreaking === true));
-    
-    return nonBreaking.slice(0, 8);
+      
+      // Double-check: Filter out breaking news
+      const nonBreaking = articles.filter(a => !(a.flags && a.flags.isBreaking === true));
+      
+      return nonBreaking.slice(0, 8);
+    } catch (error) {
+      console.error('Error in listHero:', error.message);
+      return [];
+    }
   },
 
   listBreaking: (language = 'te') => {
@@ -85,37 +90,38 @@ export const ArticleService = {
   },
 
   listLatest: async (language = 'te') => {
-    // STRICT language filtering - for Telugu, only show Telugu articles
-    // EXCLUDE breaking news from latest section - use $and to ensure breaking news is excluded
-    const baseQuery = { 
-      status: 'published',
-      $and: [
-        {
-          $or: [
-            { 'flags.isBreaking': { $ne: true } },
-            { 'flags.isBreaking': { $exists: false } },
-            { 'flags': { $exists: false } }
-          ]
-        }
-      ]
-    };
-    
-    // For Telugu, only show Telugu articles (strict)
-    if (language === 'te') {
-      baseQuery.language = 'te';
-    } else {
-      // For English, show English or universal - add to $and array
-      baseQuery.$and.push({
-        $or: [
-          { language: 'en' },
-          { language: { $exists: false } },
-          { language: null }
+    try {
+      // STRICT language filtering - for Telugu, only show Telugu articles
+      // EXCLUDE breaking news from latest section - use $and to ensure breaking news is excluded
+      const baseQuery = { 
+        status: 'published',
+        $and: [
+          {
+            $or: [
+              { 'flags.isBreaking': { $ne: true } },
+              { 'flags.isBreaking': { $exists: false } },
+              { 'flags': { $exists: false } }
+            ]
+          }
         ]
-      });
-    }
-    
-    // Get all articles matching language (excluding breaking news)
-    const allArticles = await ArticleModel.find(baseQuery)
+      };
+      
+      // For Telugu, only show Telugu articles (strict)
+      if (language === 'te') {
+        baseQuery.language = 'te';
+      } else {
+        // For English, show English or universal - add to $and array
+        baseQuery.$and.push({
+          $or: [
+            { language: 'en' },
+            { language: { $exists: false } },
+            { language: null }
+          ]
+        });
+      }
+      
+      // Get all articles matching language (excluding breaking news)
+      const allArticles = await ArticleModel.find(baseQuery)
       .sort({ publishedAt: -1 })
       .limit(50)
       .select('title slug publishedAt category language summary heroImage subTitle tags location isAggregated flags')
@@ -136,62 +142,71 @@ export const ArticleService = {
       a.isAggregated === true
     );
     
-    const otherArticles = nonBreakingArticles.filter(a => !nelloreArticles.includes(a));
-    
-    // Return Nellore/AP articles first, then others (all non-breaking)
-    return [...nelloreArticles, ...otherArticles].slice(0, 20);
+      const otherArticles = nonBreakingArticles.filter(a => !nelloreArticles.includes(a));
+      
+      // Return Nellore/AP articles first, then others (all non-breaking)
+      return [...nelloreArticles, ...otherArticles].slice(0, 20);
+    } catch (error) {
+      console.error('Error in listLatest:', error.message);
+      return [];
+    }
   },
 
   listTrending: async (language = 'te') => {
-    // Show trending articles - STRICT language filtering
-    // EXCLUDE breaking news from trending section
-    const query = { 
-      status: 'published',
-      $or: [
-        { 'flags.isBreaking': { $ne: true } },
-        { 'flags.isBreaking': { $exists: false } },
-        { 'flags': { $exists: false } }
-      ]
-    };
-    
-    // For Telugu, only show Telugu articles (strict)
-    if (language === 'te') {
-      query.language = 'te';
-    } else {
-      // For English, show English or universal
-      query.$and = [
-        {
-          $or: [
-            { 'flags.isBreaking': { $ne: true } },
-            { 'flags.isBreaking': { $exists: false } },
-            { 'flags': { $exists: false } }
-          ]
-        },
-        {
-          $or: [
-            { language: 'en' },
-            { language: { $exists: false } },
-            { language: null }
-          ]
-        }
-      ];
-      delete query.$or;
+    try {
+      // Show trending articles - STRICT language filtering
+      // EXCLUDE breaking news from trending section
+      const query = { 
+        status: 'published',
+        $or: [
+          { 'flags.isBreaking': { $ne: true } },
+          { 'flags.isBreaking': { $exists: false } },
+          { 'flags': { $exists: false } }
+        ]
+      };
+      
+      // For Telugu, only show Telugu articles (strict)
+      if (language === 'te') {
+        query.language = 'te';
+      } else {
+        // For English, show English or universal
+        query.$and = [
+          {
+            $or: [
+              { 'flags.isBreaking': { $ne: true } },
+              { 'flags.isBreaking': { $exists: false } },
+              { 'flags': { $exists: false } }
+            ]
+          },
+          {
+            $or: [
+              { language: 'en' },
+              { language: { $exists: false } },
+              { language: null }
+            ]
+          }
+        ];
+        delete query.$or;
+      }
+      
+      const articles = await ArticleModel.find(query)
+        .sort({ 
+          'stats.views': -1, 
+          publishedAt: -1 
+        })
+        .limit(20)
+        .select('title slug category publishedAt language heroImage summary flags')
+        .populate('category', 'title slug')
+        .lean();
+      
+      // Double-check: Filter out breaking news
+      const nonBreaking = articles.filter(a => !(a.flags && a.flags.isBreaking === true));
+      
+      return nonBreaking.slice(0, 10);
+    } catch (error) {
+      console.error('Error in listTrending:', error.message);
+      return [];
     }
-    
-    const articles = await ArticleModel.find(query)
-      .sort({ 
-        'stats.views': -1, 
-        publishedAt: -1 
-      })
-      .limit(20)
-      .select('title slug category publishedAt language heroImage summary flags')
-      .populate('category', 'title slug')
-      .lean();
-    
-    // Double-check: Filter out breaking news
-    const nonBreaking = articles.filter(a => !(a.flags && a.flags.isBreaking === true));
-    
-    return nonBreaking.slice(0, 10);
   },
 
   getBySlug: (slug) =>
@@ -254,14 +269,15 @@ export const ArticleService = {
    * @param {number} limit - max items to return
    */
   listByCategorySlug: async (slug, language = 'te', limit = 20) => {
-    // First get the category
-    const CategoryModel = (await import('../models/category.model.js')).CategoryModel;
-    const category = await CategoryModel.findOne({ slug }).lean();
-    
-    if (!category) {
-      console.warn(`Category not found: ${slug}`);
-      return [];
-    }
+    try {
+      // First get the category
+      const CategoryModel = (await import('../models/category.model.js')).CategoryModel;
+      const category = await CategoryModel.findOne({ slug }).lean();
+      
+      if (!category) {
+        console.warn(`Category not found: ${slug}`);
+        return [];
+      }
     
     // Then find articles for that category - STRICT language filtering
     // EXCLUDE breaking news from category sections
@@ -299,18 +315,22 @@ export const ArticleService = {
       delete query.$or;
     }
     
-    const articles = await ArticleModel.find(query)
-      .sort({ publishedAt: -1 })
-      .limit(limit * 2) // Get more to filter
-      .select('title slug publishedAt category language summary heroImage subTitle tags flags')
-      .populate('category', 'title slug')
-      .lean();
-    
-    // Double-check: Filter out breaking news
-    const nonBreaking = articles.filter(a => !(a.flags && a.flags.isBreaking === true));
-    
-    console.log(`Found ${nonBreaking.length} non-breaking articles for category ${slug} (language: ${language})`);
-    return nonBreaking.slice(0, limit);
+      const articles = await ArticleModel.find(query)
+        .sort({ publishedAt: -1 })
+        .limit(limit * 2) // Get more to filter
+        .select('title slug publishedAt category language summary heroImage subTitle tags flags')
+        .populate('category', 'title slug')
+        .lean();
+      
+      // Double-check: Filter out breaking news
+      const nonBreaking = articles.filter(a => !(a.flags && a.flags.isBreaking === true));
+      
+      console.log(`Found ${nonBreaking.length} non-breaking articles for category ${slug} (language: ${language})`);
+      return nonBreaking.slice(0, limit);
+    } catch (error) {
+      console.error(`Error in listByCategorySlug for ${slug}:`, error.message);
+      return [];
+    }
   },
   
   // Get Nellore-specific news

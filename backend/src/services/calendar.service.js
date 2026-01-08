@@ -14,13 +14,18 @@ const buildDateRange = ({ year, month }) => {
 
 export const CalendarService = {
   listEvents: async ({ year, month }) => {
-    const range = buildDateRange({ year, month });
-    if (!range) {
-      throw new Error('Invalid year provided');
+    try {
+      const range = buildDateRange({ year, month });
+      if (!range) {
+        throw new Error('Invalid year provided');
+      }
+      const filter = { date: { $gte: range.start, $lt: range.end } };
+      const events = await CalendarEventModel.find(filter).sort({ date: 1 }).lean();
+      return events;
+    } catch (error) {
+      console.error('Error in CalendarService.listEvents:', error.message);
+      return [];
     }
-    const filter = { date: { $gte: range.start, $lt: range.end } };
-    const events = await CalendarEventModel.find(filter).sort({ date: 1 }).lean();
-    return events;
   },
 
   createEvent: async (payload) => CalendarEventModel.create(payload),

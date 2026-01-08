@@ -107,7 +107,7 @@ export const Header = () => {
               to="/"
               className="text-4xl font-serif font-semibold uppercase tracking-[.3rem] text-primary block leading-none"
             >
-              NLR NEWS
+              NLR LIVE NEWS
             </Link>
             <p className="text-xs uppercase tracking-[0.4em] text-gray-500 mt-1">{t('header.tagline')}</p>
           </div>
@@ -119,7 +119,7 @@ export const Header = () => {
             <div className="relative">
               <input
                 className="border border-gray-300 rounded-full pl-4 pr-10 py-2 text-sm w-56 focus:outline-primary bg-gray-50"
-                placeholder={language === 'te' ? 'భారత్ బులెటిన్ శోధన' : 'Search Bharat Bulletin'}
+                placeholder={language === 'te' ? 'NLR LIVE NEWS శోధన' : 'Search NLR LIVE NEWS'}
               />
               <MagnifyingGlassIcon className="w-5 h-5 text-primary absolute right-3 top-2.5" />
             </div>

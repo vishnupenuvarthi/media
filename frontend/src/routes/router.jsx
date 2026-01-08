@@ -21,11 +21,7 @@ export const router = createBrowserRouter([
     children: [
       { 
         index: true, 
-        element: (
-          <RequireAuth>
-            <HomePage />
-          </RequireAuth>
-        ) 
+        element: <HomePage />
       },
       { 
         path: 'calendar', 

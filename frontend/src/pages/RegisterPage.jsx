@@ -148,7 +148,7 @@ export const RegisterPage = () => {
         <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
           {/* Header */}
           <div className="bg-primary text-white p-8 text-center">
-            <div className="text-4xl font-serif font-bold mb-2">NLR NEWS</div>
+            <div className="text-4xl font-serif font-bold mb-2">NLR LIVE NEWS</div>
             <h1 className="text-2xl font-serif font-semibold mb-2">{t('title')}</h1>
             <p className="text-primary-100 text-sm">{t('subtitle')}</p>
           </div>

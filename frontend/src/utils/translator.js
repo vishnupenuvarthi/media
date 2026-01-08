@@ -23,7 +23,7 @@ const translations = {
         lifestyle: 'Lifestyle',
         opinion: 'Opinion',
         calendar: 'Calendar',
-        nlrCalendar: 'NLR NEWS Calendar',
+        nlrCalendar: 'NLR LIVE NEWS Calendar',
         youtube: 'YouTube',
         breaking: 'Breaking News'
       },
@@ -86,7 +86,7 @@ const translations = {
       viewAll: 'View gallery →'
     },
     footer: {
-      aboutTitle: 'Bharat Bulletin',
+      aboutTitle: 'NLR LIVE NEWS',
       aboutDescription:
         'Real-time, trustworthy reporting powered by a modern newsroom stack and experienced journalists across India.',
       networkTitle: 'Network',
@@ -106,7 +106,7 @@ const translations = {
     auth: {
       register: {
         title: 'Create Your Account',
-        subtitle: 'Join Bharat Bulletin and stay informed',
+        subtitle: 'Join NLR LIVE NEWS and stay informed',
         fullName: 'Full Name',
         email: 'Email Address',
         password: 'Password',
@@ -139,7 +139,7 @@ const translations = {
       },
       login: {
         title: 'Welcome Back',
-        subtitle: 'Sign in to your Bharat Bulletin account',
+        subtitle: 'Sign in to your NLR LIVE NEWS account',
         email: 'Email Address',
         password: 'Password',
         remember: 'Remember me',
@@ -156,7 +156,7 @@ const translations = {
       }
     },
     calendar: {
-      heroTitle: 'Bharat Bulletin Calendar · 2026',
+      heroTitle: 'NLR LIVE NEWS Calendar · 2026',
       heroSubtitle: 'Track national events, newsroom priorities, and assignments across 2026.',
       editorialPlanner: 'Editorial Planner',
       liveDescription: 'Track national events, newsroom priorities, and your custom assignments across the 2026 publishing cycle.',
@@ -215,7 +215,7 @@ const translations = {
       },
       live: {
         title: 'Live Coverage',
-        description: 'Minute-by-minute updates from the Bharat Bulletin live desk.',
+        description: 'Minute-by-minute updates from the NLR LIVE NEWS live desk.',
         loading: 'Loading live blog...'
       },
       dashboard: {
@@ -270,7 +270,7 @@ const translations = {
         lifestyle: 'లైఫ్ స్టైల్',
         opinion: 'సంపాదకీయాలు',
         calendar: 'కాలెండర్',
-        nlrCalendar: 'NLR NEWS కాలెండర్',
+        nlrCalendar: 'NLR LIVE NEWS కాలెండర్',
         youtube: 'యూట్యూబ్'
       },
       secondaryNav: {
