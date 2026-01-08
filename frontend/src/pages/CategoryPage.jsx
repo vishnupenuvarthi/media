@@ -63,15 +63,21 @@ export const CategoryPage = () => {
         <article className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
           <Link to={`/article/${data.featured.slug}`} className="group">
             <div className="grid md:grid-cols-[1.5fr_1fr] gap-6">
-              <div className="overflow-hidden rounded-xl">
-                <img
-                  src={data.featured.heroImage || 'https://via.placeholder.com/800x400/4A5568/FFFFFF?text=News'}
-                  alt={data.featured.title}
-                  className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
-                  onError={(e) => {
-                    e.currentTarget.src = 'https://via.placeholder.com/800x400/4A5568/FFFFFF?text=News';
-                  }}
-                />
+              <div className="overflow-hidden rounded-xl bg-gray-100">
+                {data.featured.heroImage ? (
+                  <img
+                    src={data.featured.heroImage}
+                    alt={data.featured.title}
+                    className="w-full h-80 object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://via.placeholder.com/800x400/4A5568/FFFFFF?text=News';
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-80 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                    <span className="text-gray-400">No Image Available</span>
+                  </div>
+                )}
               </div>
               <div className="flex flex-col justify-center space-y-4">
                 <p className="text-xs uppercase tracking-[0.4em] text-primary">Featured Story</p>
@@ -104,8 +110,8 @@ export const CategoryPage = () => {
                 to={`/article/${story.slug}`} 
                 className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all group overflow-hidden"
               >
-                {story.heroImage && (
-                  <div className="overflow-hidden">
+                <div className="overflow-hidden bg-gray-100">
+                  {story.heroImage ? (
                     <img
                       src={story.heroImage}
                       alt={story.title}
@@ -114,8 +120,12 @@ export const CategoryPage = () => {
                         e.currentTarget.src = 'https://via.placeholder.com/400x300/4A5568/FFFFFF?text=News';
                       }}
                     />
-                  </div>
-                )}
+                  ) : (
+                    <div className="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                      <span className="text-gray-400 text-sm">No Image</span>
+                    </div>
+                  )}
+                </div>
                 <div className="p-4 space-y-2">
                   <p className="text-xs uppercase tracking-[0.4em] text-gray-400">
                     {translateCategory(language, story.category)}

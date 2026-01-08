@@ -64,11 +64,6 @@ export const HomePage = () => {
 
   return (
     <div className="space-y-10 pb-12">
-      {/* Calendar and YouTube sections at the top */}
-      <div className="max-w-6xl mx-auto px-4 space-y-10">
-        <CalendarSection events={data.calendar || []} />
-        <YouTubeSection videos={data.youtube || []} />
-      </div>
       <HeroSection stories={data.hero || []} />
       <div className="max-w-6xl mx-auto px-4 grid lg:grid-cols-[2fr_0.8fr] gap-8">
         <SectionStack sections={data.sections || data.categorySections || []} />
@@ -77,6 +72,8 @@ export const HomePage = () => {
       <div className="max-w-6xl mx-auto px-4 space-y-10">
         <SectionStack sections={data.categorySections || []} />
         <LatestFeed stories={data.latest || []} />
+        <CalendarSection events={data.calendar || []} />
+        <YouTubeSection videos={data.youtube || []} />
         <VideoRail stories={data.videos || []} />
         <PhotoCarousel stories={data.photos || []} />
       </div>

@@ -21,7 +21,11 @@ export const router = createBrowserRouter([
     children: [
       { 
         index: true, 
-        element: <HomePage />
+        element: (
+          <RequireAuth>
+            <HomePage />
+          </RequireAuth>
+        )
       },
       { 
         path: 'calendar', 
@@ -33,11 +37,19 @@ export const router = createBrowserRouter([
       },
       { 
         path: 'breaking', 
-        element: <BreakingNewsPage />
+        element: (
+          <RequireAuth>
+            <BreakingNewsPage />
+          </RequireAuth>
+        )
       },
       { 
         path: 'category/:slug', 
-        element: <CategoryPage />
+        element: (
+          <RequireAuth>
+            <CategoryPage />
+          </RequireAuth>
+        )
       },
       { 
         path: 'article/:slug', 

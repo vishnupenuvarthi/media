@@ -10,9 +10,9 @@ export const ArticlePage = () => {
   const language = useLanguageStore((state) => state.language);
   const t = (key) => translate(language, `pages.article.${key}`);
   const { data, isLoading } = useQuery({
-    queryKey: ['article', slug],
+    queryKey: ['article', slug, language],
     queryFn: async () => {
-      const { data } = await api.get(`/articles/${slug}`);
+      const { data } = await api.get(`/articles/${slug}?lang=${language}`);
       return data;
     }
   });
@@ -36,10 +36,20 @@ export const ArticlePage = () => {
           <span>{data.stats?.readTime ?? 5} min read</span>
         </div>
       </header>
-      <img
-        src={data.heroImage ?? 'https://images.unsplash.com/photo-1470165518243-ff5de618be2b?auto=format&fit=crop&w=1200&q=60'}
-        className="w-full rounded-xl"
-      />
+      {data.heroImage ? (
+        <img
+          src={data.heroImage}
+          alt={data.title}
+          className="w-full rounded-xl"
+          onError={(e) => {
+            e.currentTarget.src = 'https://via.placeholder.com/1200x600/4A5568/FFFFFF?text=News';
+          }}
+        />
+      ) : (
+        <div className="w-full h-96 bg-gradient-to-br from-gray-200 to-gray-300 rounded-xl flex items-center justify-center">
+          <span className="text-gray-400 text-lg">No Image Available</span>
+        </div>
+      )}
       <section className="prose max-w-none" dangerouslySetInnerHTML={{ __html: data.body }} />
       <section>
         <h3 className="font-semibold mb-2">{t('tags')}</h3>

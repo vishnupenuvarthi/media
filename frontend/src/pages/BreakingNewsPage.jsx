@@ -94,22 +94,27 @@ export const BreakingNewsPage = () => {
               to={`/article/${article.slug}`}
               className="group bg-white/10 backdrop-blur-sm rounded-xl border border-gray-700/50 hover:bg-white/20 hover:border-yellow-400/50 transition-all duration-300 overflow-hidden"
             >
-              {article.heroImage && (
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={article.heroImage}
-                    alt={article.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
-                  <div className="absolute top-3 left-3 px-3 py-1 bg-red-600 text-white text-xs font-bold uppercase tracking-wide rounded">
-                    Breaking
+              <div className="relative h-48 overflow-hidden bg-gray-100">
+                {article.heroImage ? (
+                  <>
+                    <img
+                      src={article.heroImage}
+                      alt={article.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://via.placeholder.com/400x300/4A5568/FFFFFF?text=Breaking+News';
+                      }}
+                    />
+                    <div className="absolute top-3 left-3 px-3 py-1 bg-red-600 text-white text-xs font-bold uppercase tracking-wide rounded">
+                      Breaking
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                    <span className="text-gray-400 text-sm">No Image</span>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
               <div className="p-5">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs uppercase tracking-[0.3em] text-yellow-400 font-semibold">

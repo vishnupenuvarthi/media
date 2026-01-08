@@ -16,14 +16,20 @@ export const HeroSection = ({ stories = [] }) => {
       <div className="grid lg:grid-cols-[2fr_1fr] gap-6">
         <article className="relative rounded-2xl overflow-hidden shadow-newsroom group cursor-pointer">
           <Link to={`/article/${main.slug}`}>
-            <img
-              src={main.heroImage || 'https://via.placeholder.com/1200x600/4A5568/FFFFFF?text=News'}
-              alt={main.title}
-              className="w-full h-[460px] object-cover group-hover:scale-105 transition-transform duration-500"
-              onError={(e) => {
-                e.currentTarget.src = 'https://via.placeholder.com/1200x600/4A5568/FFFFFF?text=News';
-              }}
-            />
+            {main.heroImage ? (
+              <img
+                src={main.heroImage}
+                alt={main.title}
+                className="w-full h-[460px] object-cover group-hover:scale-105 transition-transform duration-500"
+                onError={(e) => {
+                  e.currentTarget.src = 'https://via.placeholder.com/1200x600/4A5568/FFFFFF?text=News';
+                }}
+              />
+            ) : (
+              <div className="w-full h-[460px] bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
+                <span className="text-gray-500 text-lg">No Image Available</span>
+              </div>
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
             <div className="absolute bottom-0 p-8 text-white space-y-4">
               <span className="inline-flex items-center text-[11px] font-cond tracking-[0.4em] uppercase px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
@@ -50,14 +56,22 @@ export const HeroSection = ({ stories = [] }) => {
               to={`/article/${story.slug}`}
               className="flex gap-4 pb-4 border-b border-gray-200 last:border-none hover:opacity-90 transition"
             >
-              <img
-                src={story.heroImage || 'https://via.placeholder.com/200x200/4A5568/FFFFFF?text=News'}
-                alt={story.title}
-                className="w-24 h-24 object-cover rounded-lg"
-                onError={(e) => {
-                  e.currentTarget.src = 'https://via.placeholder.com/200x200/4A5568/FFFFFF?text=News';
-                }}
-              />
+              <div className="w-24 h-24 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                {story.heroImage ? (
+                  <img
+                    src={story.heroImage}
+                    alt={story.title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://via.placeholder.com/200x200/4A5568/FFFFFF?text=News';
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                    <span className="text-gray-400 text-xs">No Image</span>
+                  </div>
+                )}
+              </div>
               <div className="flex-1">
                 <p className="text-xs text-primary uppercase tracking-[0.4em]">{translateCategory(language, story.category)}</p>
                 <h3 className="font-serif font-semibold text-lg leading-snug">{story.title}</h3>

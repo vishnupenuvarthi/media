@@ -47,6 +47,9 @@ export const getArticle = asyncHandler(async (req, res) => {
       throw new ApiError(503, 'Database not connected. Please try again later.');
     }
 
+    // Get language from query, default to Telugu
+    const language = req.query.lang === 'en' ? 'en' : 'te';
+
     const article = await ArticleService.getBySlug(req.params.slug).catch(() => null);
     if (!article) {
       throw new ApiError(404, 'Article not found');
@@ -54,8 +57,8 @@ export const getArticle = asyncHandler(async (req, res) => {
 
     const doc = article;
     
-    // Get related articles from same category
-    const related = await ArticleService.listByCategory(doc.category?._id || doc.category).catch(() => []);
+    // Get related articles from same category with language filter
+    const related = await ArticleService.listByCategory(doc.category?._id || doc.category, language).catch(() => []);
     const relatedFormatted = (related || [])
       .filter((item) => item._id.toString() !== doc._id.toString())
       .slice(0, 4)
