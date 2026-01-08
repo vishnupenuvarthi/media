@@ -44,6 +44,14 @@ export const router = createBrowserRouter([
         )
       },
       { 
+        path: 'category/tag/:tag', 
+        element: (
+          <RequireAuth>
+            <CategoryPage />
+          </RequireAuth>
+        )
+      },
+      { 
         path: 'category/:slug', 
         element: (
           <RequireAuth>

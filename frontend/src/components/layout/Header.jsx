@@ -22,14 +22,14 @@ const primaryNavKeys = [
 ];
 
 const secondaryNavKeys = [
-  { key: 'cities', path: '/' },
-  { key: 'budget', path: '/' },
-  { key: 'elections', path: '/' },
+  { key: 'cities', path: '/category/tag/cities' },
+  { key: 'budget', path: '/category/tag/budget' },
+  { key: 'elections', path: '/category/tag/elections' },
   { key: 'calendar2026', path: '/calendar' },
-  { key: 'podcasts', path: '/' },
-  { key: 'explainers', path: '/' },
-  { key: 'photos', path: '/' },
-  { key: 'videos', path: '/' }
+  { key: 'podcasts', path: '/category/tag/podcasts' },
+  { key: 'explainers', path: '/category/tag/explainers' },
+  { key: 'photos', path: '/category/tag/photos' },
+  { key: 'videos', path: '/category/tag/videos' }
 ];
 
 const languageOptions = [

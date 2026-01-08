@@ -6,17 +6,24 @@ import { translate, translateCategory } from '@/utils/translator';
 import dayjs from '@/utils/dayjs';
 
 export const CategoryPage = () => {
-  const { slug = '' } = useParams();
+  const { slug, tag } = useParams();
   const language = useLanguageStore((state) => state.language);
   const t = (key) => translate(language, `pages.category.${key}`);
   
+  // Determine if this is a tag-based route or regular category
+  const isTagRoute = !!tag;
+  const identifier = tag || slug || '';
+  const apiPath = isTagRoute 
+    ? `/categories/tag/${tag}?lang=${language}` 
+    : `/categories/${slug}?lang=${language}`;
+  
   const { data, isLoading, error } = useQuery({
-    queryKey: ['category', slug, language],
+    queryKey: ['category', isTagRoute ? `tag-${tag}` : slug, language],
     queryFn: async () => {
-      const { data } = await api.get(`/categories/${slug}?lang=${language}`);
+      const { data } = await api.get(apiPath);
       return data;
     },
-    enabled: !!slug
+    enabled: !!identifier
   });
 
   if (isLoading) {
@@ -39,10 +46,15 @@ export const CategoryPage = () => {
     return (
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-8 text-center">
-          <h2 className="text-2xl font-serif mb-2">Category Not Found</h2>
-          <p className="text-gray-600 mb-4">The category "{slug}" could not be found or has no articles.</p>
+          <h2 className="text-2xl font-serif mb-2">{t('notFound') || 'Category Not Found'}</h2>
+          <p className="text-gray-600 mb-4">
+            {isTagRoute 
+              ? `${t('noTagArticles') || `No articles found for "${tag}"`}.`
+              : `${t('noCategoryArticles') || `The category "${slug}" could not be found or has no articles`}.`
+            }
+          </p>
           <Link to="/" className="text-primary font-semibold hover:underline">
-            ← Back to Home
+            {t('backToHome') || '← Back to Home'}
           </Link>
         </div>
       </div>
@@ -97,9 +109,16 @@ export const CategoryPage = () => {
       )}
 
       <section className="space-y-6">
-        <div className="flex items-center justify-between border-b border-gray-200 pb-2">
-          <h2 className="text-2xl font-serif">Latest Articles</h2>
-          <p className="text-sm text-gray-500">{allStories.length} articles</p>
+        <div className="flex items-center justify-between border-b border-gray-200 pb-3">
+          <div>
+            <h2 className="text-2xl font-serif font-bold">{t('latestArticles') || 'Latest Articles'}</h2>
+            <p className="text-sm text-gray-500 mt-1">{t('showingResults') || `Showing ${allStories.length} ${allStories.length === 1 ? 'article' : 'articles'}`}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full">
+              {language === 'en' ? 'English' : 'తెలుగు'}
+            </span>
+          </div>
         </div>
         
         {data.latest && data.latest.length > 0 ? (
