@@ -9,11 +9,19 @@ const RETRY_DELAY = 5000;
 const connectWithRetry = async () => {
   try {
     const options = {
-      serverSelectionTimeoutMS: 10000,
+      serverSelectionTimeoutMS: 30000, // Increased timeout for Render
       socketTimeoutMS: 45000,
       maxPoolSize: 10,
       retryWrites: true,
       w: 'majority',
+      // SSL/TLS options for MongoDB Atlas
+      ssl: true,
+      sslValidate: true,
+      // Additional connection options for better compatibility
+      connectTimeoutMS: 30000,
+      heartbeatFrequencyMS: 10000,
+      // Retry connection options
+      retryReads: true
     };
 
     const conn = await mongoose.connect(env.mongoUri, options);
