@@ -21,8 +21,9 @@ const start = async () => {
     }, 2000);
   }
   
-  app.listen(env.port, () => {
-    console.log(`🚀 Server running on port ${env.port}`);
+  const port = env.port || process.env.PORT || 5000;
+  app.listen(port, '0.0.0.0', () => {
+    console.log(`🚀 Server running on port ${port}`);
     if (!isDbConnected()) {
       console.warn('⚠️  Server started but database is not connected. Some features may not work.');
     }

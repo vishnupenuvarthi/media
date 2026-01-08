@@ -1,8 +1,21 @@
 import axios from 'axios';
 import { useAuthStore } from '@/store/useAuthStore';
 
+// Use environment variable for API URL, fallback to proxy in development
+const getApiBaseURL = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  // Development: use proxy
+  if (import.meta.env.DEV) {
+    return '/api';
+  }
+  // Production: use relative path (will be set via Vercel env var)
+  return '/api';
+};
+
 export const api = axios.create({
-  baseURL: '/api',
+  baseURL: getApiBaseURL(),
   withCredentials: true
 });
 
