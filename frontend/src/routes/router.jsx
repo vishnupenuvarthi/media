@@ -33,19 +33,11 @@ export const router = createBrowserRouter([
       },
       { 
         path: 'breaking', 
-        element: (
-          <RequireAuth>
-            <BreakingNewsPage />
-          </RequireAuth>
-        ) 
+        element: <BreakingNewsPage />
       },
       { 
         path: 'category/:slug', 
-        element: (
-          <RequireAuth>
-            <CategoryPage />
-          </RequireAuth>
-        ) 
+        element: <CategoryPage />
       },
       { 
         path: 'article/:slug', 

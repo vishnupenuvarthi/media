@@ -6,10 +6,10 @@ import { useLanguageStore } from '@/store/useLanguageStore';
 import { translate } from '@/utils/translator';
 
 const primaryNavKeys = [
-  { key: 'latest', path: '/' },
-  { key: 'breaking', path: '/breaking', label: 'Breaking News' },
   { key: 'nlrCalendar', path: '/calendar' },
   { key: 'youtube', path: '/youtube' },
+  { key: 'latest', path: '/' },
+  { key: 'breaking', path: '/breaking', label: 'Breaking News' },
   { key: 'india', path: '/category/india' },
   { key: 'world', path: '/category/world' },
   { key: 'business', path: '/category/business' },
