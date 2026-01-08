@@ -1,7 +1,7 @@
 const translations = {
   en: {
     header: {
-      tagline: "India's Newsroom Of Record",
+      tagline: "Nellore Newsroom Of Record",
       newsroomAccess: 'Newsroom Access',
       joinNewsroom: 'Join the newsroom',
       login: 'Login',
@@ -23,7 +23,7 @@ const translations = {
         lifestyle: 'Lifestyle',
         opinion: 'Opinion',
         calendar: 'Calendar',
-        nlrCalendar: 'NLR LIVE NEWS Calendar',
+        nlrCalendar: 'NLR LIVE NEWS CALENDER',
         youtube: 'YouTube',
         breaking: 'Breaking News'
       },

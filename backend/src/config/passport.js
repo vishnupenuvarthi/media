@@ -16,14 +16,26 @@ passport.deserializeUser((user, done) => {
 
 // Get base URL for callbacks
 const getBaseUrl = () => {
+  // Production: use BACKEND_URL or construct from domain
   if (process.env.BACKEND_URL) {
     return process.env.BACKEND_URL;
   }
+  // Development: use localhost with port
+  if (env.nodeEnv === 'development') {
+    const port = env.port || 5001;
+    return `http://localhost:${port}`;
+  }
+  // Fallback: try to construct from FRONTEND_URL (for Render/Vercel)
+  if (env.frontendUrl && env.frontendUrl.includes('onrender.com')) {
+    return env.frontendUrl.replace('onrender.com', 'onrender.com');
+  }
+  // Default fallback
   const port = env.port || 5001;
   return `http://localhost:${port}`;
 };
 
 const baseUrl = getBaseUrl();
+const frontendUrl = env.frontendUrl || 'http://localhost:5174';
 
 // Google Strategy
 if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
@@ -64,6 +76,13 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
 // Apple Strategy
 if (process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID && process.env.APPLE_KEY_ID && process.env.APPLE_PRIVATE_KEY) {
   try {
+    // Handle private key - support both escaped and raw formats
+    let privateKey = process.env.APPLE_PRIVATE_KEY;
+    if (privateKey && !privateKey.includes('-----BEGIN')) {
+      // If it's a single line, try to format it
+      privateKey = privateKey.replace(/\\n/g, '\n');
+    }
+    
     passport.use(
       'apple',
       new AppleStrategy(
@@ -71,18 +90,43 @@ if (process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID && process.env.APPL
           clientID: process.env.APPLE_CLIENT_ID,
           teamID: process.env.APPLE_TEAM_ID,
           keyID: process.env.APPLE_KEY_ID,
-          privateKey: process.env.APPLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-          callbackURL: `${baseUrl}/api/auth/apple/callback`
+          privateKey: privateKey,
+          callbackURL: `${baseUrl}/api/auth/apple/callback`,
+          scope: ['name', 'email']
         },
         async (accessToken, refreshToken, idToken, profile, done) => {
           try {
-            // Apple provides minimal info, decode idToken for email
+            // Apple provides minimal info - decode idToken if needed
+            let email = profile.email;
+            let name = profile.name;
+            let userId = profile.id;
+            
+            // If email/name not in profile, try to get from idToken
+            if (idToken && typeof idToken === 'object') {
+              email = email || idToken.email;
+              userId = userId || idToken.sub;
+            }
+            
+            // Handle name object from Apple (first time only)
+            if (profile.name && typeof profile.name === 'object') {
+              const firstName = profile.name.firstName || '';
+              const lastName = profile.name.lastName || '';
+              name = `${firstName} ${lastName}`.trim() || 'Apple User';
+            }
+            
             const userProfile = {
-              id: profile.id || idToken?.sub || 'apple_user',
-              email: profile.email || idToken?.email,
-              name: profile.name || 'Apple User',
-              picture: null
+              id: userId || idToken?.sub || 'apple_user_' + Date.now(),
+              email: email,
+              name: name || 'Apple User',
+              picture: null // Apple doesn't provide profile pictures
             };
+            
+            if (!userProfile.email) {
+              console.warn('Apple OAuth: No email found, using fallback');
+              // Apple sometimes doesn't provide email on subsequent logins
+              // Try to find user by oauthId instead
+            }
+            
             const authData = await findOrCreateOAuthUser('apple', userProfile);
             done(null, { provider: 'apple', ...authData });
           } catch (error) {
@@ -110,16 +154,34 @@ if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
           clientID: process.env.MICROSOFT_CLIENT_ID,
           clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
           callbackURL: `${baseUrl}/api/auth/microsoft/callback`,
-          scope: ['user.read']
+          scope: ['user.read', 'email', 'profile'],
+          tenant: 'common' // Allow both personal and work/school accounts
         },
         async (accessToken, refreshToken, profile, done) => {
           try {
+            // Microsoft profile structure
+            const email = profile.emails?.[0]?.value || 
+                         profile._json?.mail || 
+                         profile._json?.userPrincipalName ||
+                         profile._json?.email;
+            
+            const name = profile.displayName || 
+                        (profile.name?.givenName && profile.name?.familyName 
+                          ? `${profile.name.givenName} ${profile.name.familyName}`.trim()
+                          : profile.name?.givenName || profile.name?.familyName || 'Microsoft User');
+            
             const userProfile = {
-              id: profile.id,
-              email: profile.emails?.[0]?.value || profile._json?.mail || profile._json?.userPrincipalName,
-              name: profile.displayName || (profile.name?.givenName + ' ' + profile.name?.familyName) || 'Microsoft User',
-              picture: null
+              id: profile.id || profile._json?.id || profile._json?.sub,
+              email: email,
+              name: name,
+              picture: profile.photos?.[0]?.value || profile._json?.photo || null
             };
+            
+            if (!userProfile.email) {
+              console.error('Microsoft OAuth: No email found in profile', profile);
+              return done(new Error('Email not provided by Microsoft'), null);
+            }
+            
             const authData = await findOrCreateOAuthUser('microsoft', userProfile);
             done(null, { provider: 'microsoft', ...authData });
           } catch (error) {

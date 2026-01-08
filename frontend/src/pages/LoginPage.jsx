@@ -18,6 +18,21 @@ export const LoginPage = () => {
   const t = (key, replacements) => translate(language, `auth.login.${key}`, replacements);
   const errors = (key) => translate(language, `auth.errors.${key}`);
 
+  // Check for OAuth errors in URL
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const oauthError = urlParams.get('error');
+    if (oauthError) {
+      const errorMessages = {
+        'oauth_failed': 'OAuth authentication failed. Please try again.',
+        'oauth_not_configured': 'OAuth is not configured on the server. Please contact support.',
+        'oauth_error': 'An error occurred during OAuth authentication.',
+        'oauth_missing_data': 'Incomplete authentication data received.'
+      };
+      setError(errorMessages[oauthError] || decodeURIComponent(oauthError));
+    }
+  }, [location.search]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));

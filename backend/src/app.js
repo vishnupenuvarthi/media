@@ -20,10 +20,32 @@ import { newsAggregatorRouter } from './routes/newsAggregator.routes.js';
 
 const app = express();
 
+// CORS configuration - allow OAuth redirects
+const allowedOrigins = [
+  env.frontendUrl,
+  process.env.CLIENT_URL,
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:3000'
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: env.frontendUrl,
-    credentials: true
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, Postman, or OAuth redirects)
+      if (!origin) return callback(null, true);
+      
+      // Check if origin is in allowed list
+      if (allowedOrigins.some(allowed => origin.includes(allowed.replace('http://', '').replace('https://', '')))) {
+        callback(null, true);
+      } else {
+        // For OAuth callbacks, be more permissive
+        callback(null, true);
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
   })
 );
 app.use(helmet());

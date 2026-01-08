@@ -62,7 +62,7 @@ router.get('/microsoft', (req, res, next) => {
       message: 'Microsoft OAuth is not configured. Please set MICROSOFT_CLIENT_ID and MICROSOFT_CLIENT_SECRET in environment variables.'
     });
   }
-  passport.authenticate('microsoft', { scope: ['user.read'] })(req, res, next);
+  passport.authenticate('microsoft', { scope: ['user.read', 'email', 'profile'] })(req, res, next);
 });
 
 router.get(
