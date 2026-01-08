@@ -12,12 +12,32 @@ export const LoginPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [oauthStatus, setOauthStatus] = useState({ google: true, microsoft: true, apple: true }); // Default to enabled
   const navigate = useNavigate();
   const location = useLocation();
   const setAuth = useAuthStore((state) => state.setAuth);
   const language = useLanguageStore((state) => state.language);
   const t = (key, replacements) => translate(language, `auth.login.${key}`, replacements);
   const errors = (key) => translate(language, `auth.errors.${key}`);
+
+  // Check OAuth status on mount
+  useEffect(() => {
+    const checkOAuthStatus = async () => {
+      try {
+        const { data } = await api.get('/auth/status');
+        console.log('OAuth status:', data);
+        setOauthStatus({
+          google: data.configured?.google || false,
+          microsoft: data.configured?.microsoft || false,
+          apple: data.configured?.apple || false
+        });
+      } catch (err) {
+        console.warn('Could not check OAuth status:', err);
+        // Keep default enabled state if status check fails
+      }
+    };
+    checkOAuthStatus();
+  }, []);
 
   // Check for OAuth errors in URL
   useEffect(() => {
