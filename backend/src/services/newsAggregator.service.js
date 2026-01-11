@@ -16,41 +16,28 @@ const parser = new Parser({
 // Using English-only feeds that work reliably, then categorizing based on content
 const RSS_SOURCES = {
   en: [
-    // General India News
+    // Priority: Nellore & Andhra Pradesh
+    'https://news.google.com/rss/search?q=Nellore+news&hl=en-IN&gl=IN&ceid=IN:en',
+    'https://news.google.com/rss/search?q=Andhra+Pradesh+news&hl=en-IN&gl=IN&ceid=IN:en',
+    // General India News (Secondary)
     'https://news.google.com/rss/search?q=India&hl=en-IN&gl=IN&ceid=IN:en',
-    'https://news.google.com/rss/search?q=Indian+news&hl=en-IN&gl=IN&ceid=IN:en',
     // World News
     'https://news.google.com/rss/search?q=world+news&hl=en-IN&gl=IN&ceid=IN:en',
-    'https://news.google.com/rss/search?q=international&hl=en-IN&gl=IN&ceid=IN:en',
     // Business
     'https://news.google.com/rss/search?q=business&hl=en-IN&gl=IN&ceid=IN:en',
-    'https://news.google.com/rss/search?q=economy&hl=en-IN&gl=IN&ceid=IN:en',
-    // Markets
-    'https://news.google.com/rss/search?q=stock+market&hl=en-IN&gl=IN&ceid=IN:en',
-    'https://news.google.com/rss/search?q=finance&hl=en-IN&gl=IN&ceid=IN:en',
     // Tech
     'https://news.google.com/rss/search?q=technology&hl=en-IN&gl=IN&ceid=IN:en',
-    'https://news.google.com/rss/search?q=startup&hl=en-IN&gl=IN&ceid=IN:en',
     // Sports
-    'https://news.google.com/rss/search?q=sports&hl=en-IN&gl=IN&ceid=IN:en',
-    'https://news.google.com/rss/search?q=cricket&hl=en-IN&gl=IN&ceid=IN:en',
+    'https://news.google.com/rss/search?q=cricket+india&hl=en-IN&gl=IN&ceid=IN:en',
     // Entertainment
-    'https://news.google.com/rss/search?q=entertainment&hl=en-IN&gl=IN&ceid=IN:en',
-    'https://news.google.com/rss/search?q=Bollywood&hl=en-IN&gl=IN&ceid=IN:en',
-    // Lifestyle
-    'https://news.google.com/rss/search?q=lifestyle&hl=en-IN&gl=IN&ceid=IN:en',
-    // Opinion
-    'https://news.google.com/rss/search?q=editorial&hl=en-IN&gl=IN&ceid=IN:en',
+    'https://news.google.com/rss/search?q=tollywood&hl=en-IN&gl=IN&ceid=IN:en', // Tollywood priority
   ],
   te: [
-    // Use English feeds for Telugu too (we'll categorize based on content)
-    // This avoids URL encoding issues with Telugu characters
-    'https://news.google.com/rss/search?q=India&hl=en-IN&gl=IN&ceid=IN:en',
-    'https://news.google.com/rss/search?q=world+news&hl=en-IN&gl=IN&ceid=IN:en',
-    'https://news.google.com/rss/search?q=business&hl=en-IN&gl=IN&ceid=IN:en',
-    'https://news.google.com/rss/search?q=technology&hl=en-IN&gl=IN&ceid=IN:en',
-    'https://news.google.com/rss/search?q=sports&hl=en-IN&gl=IN&ceid=IN:en',
-    'https://news.google.com/rss/search?q=entertainment&hl=en-IN&gl=IN&ceid=IN:en',
+    // Priority: Nellore & Andhra Pradesh (Telugu)
+    'https://news.google.com/rss/search?q=Nellore+news+telugu&hl=te&gl=IN&ceid=IN:te',
+    'https://news.google.com/rss/search?q=Andhra+Pradesh+news+telugu&hl=te&gl=IN&ceid=IN:te',
+    // General
+    'https://news.google.com/rss/search?q=India&hl=te&gl=IN&ceid=IN:te',
   ]
 };
 
@@ -103,7 +90,7 @@ const createSlug = (title, language) => {
     .replace(/[^\w\s-]/g, '')
     .replace(/[\s_-]+/g, '-')
     .replace(/^-+|-+$/g, '');
-  
+
   // Add language prefix to avoid conflicts
   return `${language}-${slug}-${nanoid(6)}`;
 };
@@ -111,7 +98,7 @@ const createSlug = (title, language) => {
 // Helper function to extract image from content - IMPROVED to get actual news images
 const extractImage = async (link) => {
   try {
-    const response = await axios.get(link, { 
+    const response = await axios.get(link, {
       timeout: 10000,
       maxRedirects: 5,
       headers: {
@@ -124,16 +111,16 @@ const extractImage = async (link) => {
       }
     });
     const $ = cheerio.load(response.data);
-    
+
     // Priority 1: Open Graph and Twitter Card images (most reliable)
     let image = $('meta[property="og:image"]').attr('content') ||
-                $('meta[name="og:image"]').attr('content') ||
-                $('meta[property="twitter:image"]').attr('content') ||
-                $('meta[name="twitter:image"]').attr('content') ||
-                $('meta[name="twitter:image:src"]').attr('content') ||
-                $('meta[property="og:image:secure_url"]').attr('content') ||
-                $('link[rel="image_src"]').attr('href');
-    
+      $('meta[name="og:image"]').attr('content') ||
+      $('meta[property="twitter:image"]').attr('content') ||
+      $('meta[name="twitter:image"]').attr('content') ||
+      $('meta[name="twitter:image:src"]').attr('content') ||
+      $('meta[property="og:image:secure_url"]').attr('content') ||
+      $('link[rel="image_src"]').attr('href');
+
     // Priority 2: Article-specific image selectors
     if (!image) {
       const articleSelectors = [
@@ -161,7 +148,7 @@ const extractImage = async (link) => {
         '[id*="post"] img[src]',
         '[id*="featured"] img[src]'
       ];
-      
+
       for (const selector of articleSelectors) {
         const img = $(selector).first();
         if (img.length) {
@@ -170,26 +157,26 @@ const extractImage = async (link) => {
         }
       }
     }
-    
+
     // Priority 3: Look for images with specific attributes indicating they're article images
     if (!image) {
       $('img').each((i, elem) => {
         const $img = $(elem);
         const src = $img.attr('src') || $img.attr('data-src') || $img.attr('data-lazy-src') || $img.attr('data-original');
         if (!src) return;
-        
+
         // Skip small images, icons, logos, avatars
         const width = parseInt($img.attr('width') || $img.attr('data-width') || '0');
         const height = parseInt($img.attr('height') || $img.attr('data-height') || '0');
         const className = ($img.attr('class') || '').toLowerCase();
         const alt = ($img.attr('alt') || '').toLowerCase();
-        
+
         // Skip if it's likely an icon/logo/avatar
-        if (className.includes('icon') || className.includes('logo') || className.includes('avatar') || 
-            alt.includes('logo') || alt.includes('icon') || width < 300 || height < 200) {
+        if (className.includes('icon') || className.includes('logo') || className.includes('avatar') ||
+          alt.includes('logo') || alt.includes('icon') || width < 300 || height < 200) {
           return;
         }
-        
+
         // Prefer larger images
         if (width > 400 || height > 300 || !width || !height) {
           image = src;
@@ -197,7 +184,7 @@ const extractImage = async (link) => {
         }
       });
     }
-    
+
     // Priority 4: First large image in main content area
     if (!image) {
       const contentSelectors = [
@@ -208,7 +195,7 @@ const extractImage = async (link) => {
         '.article-content img',
         '[role="main"] img'
       ];
-      
+
       for (const selector of contentSelectors) {
         const imgs = $(selector);
         if (imgs.length) {
@@ -227,7 +214,7 @@ const extractImage = async (link) => {
         }
       }
     }
-    
+
     // Normalize and validate image URL
     if (image) {
       // Convert relative URLs to absolute
@@ -243,11 +230,11 @@ const extractImage = async (link) => {
       } else if (!image.startsWith('http')) {
         return null;
       }
-      
+
       // Remove query parameters that might break the URL (but keep some that might be needed)
       const urlParts = image.split('?');
       image = urlParts[0];
-      
+
       // Validate it's actually an image URL - exclude placeholder services
       const placeholderServices = [
         'picsum.photos',
@@ -257,29 +244,29 @@ const extractImage = async (link) => {
         'dummyimage.com',
         'fakeimg.pl'
       ];
-      
+
       const isPlaceholder = placeholderServices.some(service => image.includes(service));
       if (isPlaceholder) {
         return null; // Don't use placeholder images
       }
-      
+
       // Accept image URLs with extensions or from known image CDNs
-      if (image.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?|$)/i) || 
-          image.includes('googleusercontent.com') ||
-          image.includes('imgur.com') ||
-          image.includes('cloudinary.com') ||
-          image.includes('cdn') ||
-          image.includes('images') ||
-          image.match(/\/image\//) ||
-          image.match(/\/photo\//) ||
-          image.match(/\/img\//) ||
-          image.match(/\/media\//) ||
-          image.match(/\/uploads\//) ||
-          image.match(/\/wp-content\//)) {
+      if (image.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?|$)/i) ||
+        image.includes('googleusercontent.com') ||
+        image.includes('imgur.com') ||
+        image.includes('cloudinary.com') ||
+        image.includes('cdn') ||
+        image.includes('images') ||
+        image.match(/\/image\//) ||
+        image.match(/\/photo\//) ||
+        image.match(/\/img\//) ||
+        image.match(/\/media\//) ||
+        image.match(/\/uploads\//) ||
+        image.match(/\/wp-content\//)) {
         return image;
       }
     }
-    
+
     return null;
   } catch (err) {
     // Log error but don't fail - return null to try other methods
@@ -291,21 +278,21 @@ const extractImage = async (link) => {
 // Detect category from article content
 const detectCategory = async (title, description, language) => {
   const text = `${title} ${description || ''}`.toLowerCase();
-  
+
   // Track best matching category
   let bestMatch = null;
   let bestScore = 0;
-  
+
   // Check each category
   for (const [categorySlug, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
     const categoryKeywords = keywords[language] || keywords.en;
-    const matchCount = categoryKeywords.filter(keyword => 
+    const matchCount = categoryKeywords.filter(keyword =>
       text.includes(keyword.toLowerCase())
     ).length;
-    
+
     // Score based on matches (more matches = higher score)
     const score = matchCount;
-    
+
     if (score > bestScore) {
       bestScore = score;
       const category = await CategoryModel.findOne({ slug: categorySlug });
@@ -314,16 +301,16 @@ const detectCategory = async (title, description, language) => {
       }
     }
   }
-  
+
   // If we found a match (even with 1 keyword), use it
   if (bestMatch && bestScore > 0) {
     return bestMatch;
   }
-  
+
   // Default to India category
-  return await CategoryModel.findOne({ slug: 'india' }) || 
-         await CategoryModel.findOne({ slug: 'world' }) ||
-         await getDefaultCategory(language);
+  return await CategoryModel.findOne({ slug: 'india' }) ||
+    await CategoryModel.findOne({ slug: 'world' }) ||
+    await getDefaultCategory(language);
 };
 
 // Check if article should be marked as breaking news
@@ -331,11 +318,11 @@ const isBreakingNews = (title, description, publishedAt) => {
   const text = `${title} ${description || ''}`.toLowerCase();
   const breakingKeywords = ['breaking', 'urgent', 'alert', 'latest', 'just in', 'developing', 'live', 'emergency', 'crisis'];
   const hasBreakingKeyword = breakingKeywords.some(keyword => text.includes(keyword));
-  
+
   // Also mark as breaking if published in last 2 hours
   const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
   const isRecent = publishedAt && new Date(publishedAt) > twoHoursAgo;
-  
+
   return hasBreakingKeyword || isRecent;
 };
 
@@ -348,10 +335,10 @@ const cleanHtml = (html) => {
 
 // Fetch default category or create one
 const getDefaultCategory = async (language) => {
-  let category = await CategoryModel.findOne({ 
-    slug: language === 'te' ? 'nellore-telugu' : 'nellore-english' 
+  let category = await CategoryModel.findOne({
+    slug: language === 'te' ? 'nellore-telugu' : 'nellore-english'
   });
-  
+
   if (!category) {
     category = await CategoryModel.findOne({ slug: 'national' });
     if (!category) {
@@ -363,7 +350,7 @@ const getDefaultCategory = async (language) => {
       });
     }
   }
-  
+
   return category;
 };
 
@@ -371,17 +358,17 @@ const getDefaultCategory = async (language) => {
 const getSystemUser = async () => {
   // Try to find existing system user
   let user = await UserModel.findOne({ email: 'system@newsroom.local' }).catch(() => null);
-  
+
   if (!user) {
     // Try to find any existing user
     user = await UserModel.findOne({}).limit(1);
-    
+
     if (!user) {
       // Create system user if no users exist
       try {
         const bcrypt = await import('bcryptjs');
         const passwordHash = await bcrypt.default.hash('system-user-' + Date.now(), 10);
-        
+
         user = await UserModel.create({
           email: `system-${Date.now()}@newsroom.local`,
           passwordHash: passwordHash,
@@ -400,7 +387,7 @@ const getSystemUser = async () => {
       }
     }
   }
-  
+
   return user;
 };
 
@@ -429,32 +416,32 @@ const fetchFromRSS = async (feedUrl, language) => {
       // If URL parsing fails, use original with basic encoding
       encodedUrl = encodeURI(feedUrl);
     }
-    
+
     const feed = await parser.parseURL(encodedUrl);
     const articles = [];
-    
+
     for (const item of feed.items || []) {
       if (!item.title || !item.link) continue;
-      
+
       const title = item.title || '';
       const description = item.contentSnippet || item.content || item.description || '';
       const publishedAt = item.pubDate ? new Date(item.pubDate) : new Date();
-      
+
       // Check if article already exists
       const existingArticle = await ArticleModel.findOne({ sourceUrl: item.link });
       if (existingArticle) {
         continue; // Skip if already exists
       }
-      
+
       // Detect category
       const category = await detectCategory(title, description, language);
-      
+
       // Check if breaking news
       const isBreaking = isBreakingNews(title, description, publishedAt);
-      
+
       // Extract image from RSS item - try multiple sources
       let rssImage = null;
-      
+
       // Try enclosure first (most reliable)
       if (item.enclosure && item.enclosure.url) {
         if (item.enclosure.type && item.enclosure.type.startsWith('image/')) {
@@ -463,7 +450,7 @@ const fetchFromRSS = async (feedUrl, language) => {
           rssImage = item.enclosure.url;
         }
       }
-      
+
       // Try media:content
       if (!rssImage && item['media:content']) {
         if (item['media:content'].$ && item['media:content'].$.url) {
@@ -472,7 +459,7 @@ const fetchFromRSS = async (feedUrl, language) => {
           rssImage = item['media:content'][0].$.url;
         }
       }
-      
+
       // Try media:thumbnail
       if (!rssImage && item['media:thumbnail']) {
         if (item['media:thumbnail'].$ && item['media:thumbnail'].$.url) {
@@ -481,7 +468,7 @@ const fetchFromRSS = async (feedUrl, language) => {
           rssImage = item['media:thumbnail'][0].$.url;
         }
       }
-      
+
       // Try extracting from content HTML - improved regex to catch more patterns
       if (!rssImage && item.content) {
         // Try multiple patterns for img tags
@@ -491,18 +478,18 @@ const fetchFromRSS = async (feedUrl, language) => {
           /<img[^>]+data-lazy-src=["']([^"']+)["']/i,
           /<img[^>]+data-original=["']([^"']+)["']/i
         ];
-        
+
         for (const pattern of imgPatterns) {
           const imgMatch = item.content.match(pattern);
           if (imgMatch && imgMatch[1]) {
             let imgSrc = imgMatch[1];
-            
+
             // Skip placeholder images
             const placeholderServices = ['picsum.photos', 'via.placeholder.com', 'placeholder.com', 'placehold.it', 'dummyimage.com'];
             if (placeholderServices.some(service => imgSrc.includes(service))) {
               continue;
             }
-            
+
             // Convert relative URLs to absolute
             if (imgSrc.startsWith('//')) {
               imgSrc = `https:${imgSrc}`;
@@ -521,7 +508,7 @@ const fetchFromRSS = async (feedUrl, language) => {
           }
         }
       }
-      
+
       // Only add article if it has a real image (will be validated later in saveArticles)
       // We'll try to extract image from the article URL during save if RSS didn't provide one
       articles.push({
@@ -554,7 +541,7 @@ const fetchFromRSS = async (feedUrl, language) => {
         tags: extractTags(title + ' ' + description, language)
       });
     }
-    
+
     return articles;
   } catch (error) {
     console.error(`Error fetching RSS feed ${feedUrl}:`, error.message);
@@ -566,31 +553,31 @@ const fetchFromRSS = async (feedUrl, language) => {
 const extractTags = (text, language) => {
   const tags = [];
   const textLower = text.toLowerCase();
-  
+
   const tagKeywords = {
     en: ['politics', 'business', 'sports', 'education', 'health', 'weather', 'traffic'],
     te: ['రాజకీయాలు', 'వ్యాపారం', 'క్రీడలు', 'విద్య', 'ఆరోగ్యం', 'వాతావరణం']
   };
-  
+
   const keywords = tagKeywords[language] || tagKeywords.en;
   keywords.forEach(keyword => {
     if (textLower.includes(keyword.toLowerCase())) {
       tags.push(keyword);
     }
   });
-  
+
   return tags;
 };
 
 // Save articles to database
 const saveArticles = async (articles, language) => {
   if (articles.length === 0) return { saved: 0, skipped: 0 };
-  
+
   const author = await getSystemUser();
-  
+
   let saved = 0;
   let skipped = 0;
-  
+
   for (const articleData of articles) {
     try {
       // Check if article with same source URL exists
@@ -599,11 +586,11 @@ const saveArticles = async (articles, language) => {
         skipped++;
         continue;
       }
-      
+
       // CRITICAL: Only save articles with real news images - NO PLACEHOLDERS
       // Try multiple methods to extract image from article
       let extractedImage = articleData.heroImage || null;
-      
+
       // Method 1: If RSS already provided an image, validate it's not a placeholder
       if (extractedImage) {
         const placeholderServices = ['picsum.photos', 'via.placeholder.com', 'placeholder.com', 'placehold.it', 'dummyimage.com', 'placehold.co'];
@@ -611,13 +598,13 @@ const saveArticles = async (articles, language) => {
           extractedImage = null; // Reject placeholder
         }
       }
-      
+
       // Method 2: Extract from article URL if no valid image yet
       if (!extractedImage && articleData.sourceUrl) {
         try {
           // First try direct extraction from article URL
           extractedImage = await extractImage(articleData.sourceUrl);
-          
+
           // If that fails, try Google News redirect URL
           if (!extractedImage) {
             const googleThumbMatch = articleData.sourceUrl.match(/url=([^&]+)/);
@@ -634,7 +621,7 @@ const saveArticles = async (articles, language) => {
           console.warn(`Image extraction error for ${articleData.sourceUrl}:`, err.message);
         }
       }
-      
+
       // Method 3: Try to get from RSS content/body if available
       if (!extractedImage && articleData.body) {
         const imgPatterns = [
@@ -643,18 +630,18 @@ const saveArticles = async (articles, language) => {
           /<img[^>]+data-lazy-src=["']([^"']+)["']/i,
           /<img[^>]+data-original=["']([^"']+)["']/i
         ];
-        
+
         for (const pattern of imgPatterns) {
           const imgMatch = articleData.body.match(pattern);
           if (imgMatch && imgMatch[1]) {
             let imgSrc = imgMatch[1];
-            
+
             // Skip placeholder images
             const placeholderServices = ['picsum.photos', 'via.placeholder.com', 'placeholder.com', 'placehold.it', 'dummyimage.com', 'placehold.co'];
             if (placeholderServices.some(service => imgSrc.includes(service))) {
               continue;
             }
-            
+
             if (imgSrc.startsWith('//')) {
               imgSrc = `https:${imgSrc}`;
             } else if (imgSrc.startsWith('/') && articleData.sourceUrl) {
@@ -672,34 +659,34 @@ const saveArticles = async (articles, language) => {
           }
         }
       }
-      
+
       // Final validation: Ensure we have a real news image (not placeholder)
       const placeholderServices = ['picsum.photos', 'via.placeholder.com', 'placeholder.com', 'placehold.it', 'dummyimage.com', 'placehold.co'];
       const isPlaceholder = extractedImage && placeholderServices.some(service => extractedImage.includes(service));
-      
+
       if (!extractedImage || isPlaceholder) {
         // SKIP this article - only save articles with real news images
         console.warn(`⏭️  Skipping article without real image: ${articleData.title.substring(0, 50)}`);
         skipped++;
         continue; // Don't save articles without real images
       }
-      
+
       // Set the validated real news image
       articleData.heroImage = extractedImage;
       console.log(`✅ Article with real news image: ${articleData.title.substring(0, 50)} - ${extractedImage.substring(0, 60)}...`);
-      
+
       // Ensure category exists
       if (!articleData.category) {
         articleData.category = (await getDefaultCategory(language))._id;
       }
-      
+
       // Create article
       await ArticleModel.create({
         ...articleData,
         author: author._id,
         tags: [...(articleData.tags || []), 'News', 'India']
       });
-      
+
       saved++;
     } catch (error) {
       if (error.code === 11000) {
@@ -720,37 +707,37 @@ const saveArticles = async (articles, language) => {
       }
     }
   }
-  
+
   return { saved, skipped };
 };
 
 // Main aggregation function
 export const aggregateNews = async (language = 'te') => {
   console.log(`Starting news aggregation for language: ${language}`);
-  
+
   const sources = RSS_SOURCES[language] || RSS_SOURCES.te;
   const allArticles = [];
-  
+
   // Fetch from all RSS sources
   for (const feedUrl of sources) {
     try {
       console.log(`Fetching from: ${feedUrl}`);
       const articles = await fetchFromRSS(feedUrl, language);
       allArticles.push(...articles);
-      
+
       // Add delay to avoid rate limiting
       await new Promise(resolve => setTimeout(resolve, 1000));
     } catch (error) {
       console.error(`Error processing feed ${feedUrl}:`, error.message);
     }
   }
-  
+
   console.log(`Found ${allArticles.length} articles for ${language}`);
-  
+
   // Remove duplicates based on title similarity
   const uniqueArticles = [];
   const seenTitles = new Set();
-  
+
   for (const article of allArticles) {
     const titleKey = article.title.toLowerCase().substring(0, 50);
     if (!seenTitles.has(titleKey)) {
@@ -758,14 +745,14 @@ export const aggregateNews = async (language = 'te') => {
       uniqueArticles.push(article);
     }
   }
-  
+
   console.log(`After deduplication: ${uniqueArticles.length} articles`);
-  
+
   // Save to database
   const result = await saveArticles(uniqueArticles, language);
-  
+
   console.log(`Aggregation complete - Saved: ${result.saved}, Skipped: ${result.skipped}`);
-  
+
   return {
     language,
     total: uniqueArticles.length,
@@ -777,15 +764,15 @@ export const aggregateNews = async (language = 'te') => {
 // Aggregate news for both languages
 export const aggregateAllNews = async () => {
   const results = {};
-  
+
   // Aggregate Telugu news first (priority)
   results.te = await aggregateNews('te');
-  
+
   // Add delay between language aggregations
   await new Promise(resolve => setTimeout(resolve, 2000));
-  
+
   // Aggregate English news
   results.en = await aggregateNews('en');
-  
+
   return results;
 };
