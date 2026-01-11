@@ -19,7 +19,7 @@ export const CalendarPDFViewer = () => {
   const [loading, setLoading] = useState(true);
   const [containerWidth, setContainerWidth] = useState(800);
 
-  const pdfUrl = `${getBackendUrl()}/api/calendar/nlr-news-calendar-2026.pdf`;
+  const pdfUrl = `${getBackendUrl()}/api/calendar/download-pdf`;
 
   useEffect(() => {
     const updateWidth = () => {
