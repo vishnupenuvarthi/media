@@ -71,6 +71,12 @@ export const CalendarPDFViewer = () => {
           </div>
         }
         className="max-w-full shadow-md rounded-lg overflow-hidden border border-gray-200"
+        options={{
+          cMapUrl: 'cmaps/',
+          cMapPacked: true,
+          disableAutoFetch: true, // IMPORTANT: Enables range requests
+          disableStream: false,
+        }}
       >
         <Page
           pageNumber={pageNumber}

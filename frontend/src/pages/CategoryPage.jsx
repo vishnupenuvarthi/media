@@ -35,7 +35,7 @@ export const CategoryPage = () => {
         params: {
           lang: language,
           page: pageParam,
-          limit: 20
+          limit: 12 // Reduced for faster initial load
         }
       });
       return data;
