@@ -111,9 +111,9 @@ export const uploadPDF = asyncHandler(async (req, res) => {
     pdfUploadedAt: new Date(),
     createdBy: req.user?.userId
   };
-  
+
   const event = await CalendarService.createEvent(payload);
-  
+
   res.status(201).json({
     id: event._id.toString(),
     ...payload
@@ -121,7 +121,7 @@ export const uploadPDF = asyncHandler(async (req, res) => {
 });
 
 export const getNLRCalendarPdf = asyncHandler(async (req, res) => {
-  const pdfPath = path.join(__dirname, '../NLR Live News Calendar 2026.pdf');
+  const pdfPath = path.join(__dirname, '../nlr-calendar-2026.pdf');
   res.sendFile(pdfPath, (err) => {
     if (err) {
       console.error('Error serving PDF:', err);
