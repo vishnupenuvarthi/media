@@ -34,7 +34,7 @@ app.use(
     origin: function (origin, callback) {
       // Allow requests with no origin (like mobile apps, Postman, or OAuth redirects)
       if (!origin) return callback(null, true);
-      
+
       // Check if origin is in allowed list
       if (allowedOrigins.some(allowed => origin.includes(allowed.replace('http://', '').replace('https://', '')))) {
         callback(null, true);
@@ -65,7 +65,32 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
 
+app.use((req, res, next) => {
+  console.log(`[DEBUG] Incoming Request: ${req.method} ${req.url}`);
+  next();
+});
+
 app.get('/api/health', (_, res) => res.json({ status: 'ok' }));
+
+// DEBUG ROUTE: Bypass router file to test PDF serving directly
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename_debug = fileURLToPath(import.meta.url);
+const __dirname_debug = path.dirname(__filename_debug);
+
+app.get('/api/debug-pdf', (req, res) => {
+  const pdfPath = path.join(__dirname_debug, 'nlr-calendar-2026.pdf');
+  console.log('[DEBUG-ROUTE] Attempting to serve:', pdfPath);
+  import('fs').then(fs => {
+    if (fs.existsSync(pdfPath)) {
+      res.sendFile(pdfPath);
+    } else {
+      console.error('[DEBUG-ROUTE] File not found. Listing root:');
+      console.log(fs.readdirSync(__dirname_debug));
+      res.status(404).send('File not found in debug route');
+    }
+  });
+});
 
 app.use('/api/auth', authRouter);
 app.use('/api/auth', oauthRouter);
