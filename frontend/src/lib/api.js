@@ -4,7 +4,8 @@ import { useAuthStore } from '@/store/useAuthStore';
 // Use environment variable for API URL, fallback to proxy in development
 const getApiBaseURL = () => {
   if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
+    const url = import.meta.env.VITE_API_URL;
+    return url.endsWith('/api') ? url : `${url}/api`;
   }
   // Development: use proxy
   if (import.meta.env.DEV) {
