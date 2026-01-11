@@ -24,7 +24,7 @@ const translations = {
         opinion: 'Opinion',
         calendar: 'Calendar',
         nlrCalendar: 'NLR LIVE NEWS CALENDER',
-        youtube: 'YouTube',
+        youtube: 'Utube',
         breaking: 'Breaking News'
       },
       secondaryNav: {
