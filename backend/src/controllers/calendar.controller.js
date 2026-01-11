@@ -122,13 +122,26 @@ export const uploadPDF = asyncHandler(async (req, res) => {
 
 export const getNLRCalendarPdf = asyncHandler(async (req, res) => {
   const pdfPath = path.join(__dirname, '../nlr-calendar-2026.pdf');
-  res.sendFile(pdfPath, (err) => {
-    if (err) {
-      console.error('Error serving PDF:', err);
-      if (!res.headersSent) {
-        res.status(404).json({ message: 'PDF file not found' });
-      }
+  console.log('Serving PDF from:', pdfPath);
+
+  import('fs').then((fs) => {
+    if (!fs.existsSync(pdfPath)) {
+      console.error('PDF FILE NOT FOUND AT:', pdfPath);
+      // Try listing the directory to see what IS there
+      const dir = path.join(__dirname, '../');
+      console.log('listing contents of:', dir);
+      console.log(fs.readdirSync(dir));
+      return res.status(404).json({ message: 'PDF file missing on server' });
     }
+
+    res.sendFile(pdfPath, (err) => {
+      if (err) {
+        console.error('Error serving PDF:', err);
+        if (!res.headersSent) {
+          res.status(404).json({ message: 'Error serving PDF file' });
+        }
+      }
+    });
   });
 });
 
