@@ -58,9 +58,8 @@ export const Header = () => {
                   key={option.code}
                   type="button"
                   onClick={() => setLanguage(option.code)}
-                  className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] tracking-normal ${
-                    language === option.code ? 'bg-white text-secondary font-semibold' : 'hover:text-white transition'
-                  }`}
+                  className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] tracking-normal ${language === option.code ? 'bg-white text-secondary font-semibold' : 'hover:text-white transition'
+                    }`}
                 >
                   {option.label}
                 </button>
