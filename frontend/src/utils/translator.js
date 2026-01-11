@@ -1,3 +1,4 @@
+// Fixed syntax error and forcing rebuild
 const translations = {
   en: {
     header: {
