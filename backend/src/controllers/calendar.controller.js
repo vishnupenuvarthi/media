@@ -1,8 +1,13 @@
 import { body, param, query } from 'express-validator';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { CalendarService } from '../services/calendar.service.js';
 import { AppError } from '../utils/AppError.js';
 import { validateRequest } from '../middleware/validateRequest.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const validateCalendarQuery = [
   query('year').isInt({ min: 1900 }).withMessage('Year is required'),
@@ -81,4 +86,50 @@ export const deleteEvent = asyncHandler(async (req, res) => {
   if (!deleted) throw new AppError('Event not found', 404);
   res.status(204).send();
 });
+
+export const uploadPDF = asyncHandler(async (req, res) => {
+  const { title, description, date, location, category, tags } = req.body;
+
+  if (!req.file) {
+    throw new AppError('No PDF file provided', 400);
+  }
+
+  if (req.file.mimetype !== 'application/pdf') {
+    throw new AppError('Only PDF files are allowed', 400);
+  }
+
+  const payload = {
+    title,
+    description,
+    date: date || new Date(),
+    location,
+    category: category || 'pdf',
+    tags: tags ? (Array.isArray(tags) ? tags : [tags]) : [],
+    isPdfEvent: true,
+    pdfFileName: req.file.originalname,
+    pdfSize: req.file.size,
+    pdfUploadedAt: new Date(),
+    createdBy: req.user?.userId
+  };
+  
+  const event = await CalendarService.createEvent(payload);
+  
+  res.status(201).json({
+    id: event._id.toString(),
+    ...payload
+  });
+});
+
+export const getNLRCalendarPdf = asyncHandler(async (req, res) => {
+  const pdfPath = path.join(__dirname, '../NLR Live News Calendar 2026.pdf');
+  res.sendFile(pdfPath, (err) => {
+    if (err) {
+      console.error('Error serving PDF:', err);
+      if (!res.headersSent) {
+        res.status(404).json({ message: 'PDF file not found' });
+      }
+    }
+  });
+});
+
 
