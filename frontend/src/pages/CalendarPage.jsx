@@ -5,6 +5,7 @@ import { api } from '@/lib/api';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { translate, translateArray } from '@/utils/translator';
+import { CalendarPDFViewer } from '@/components/home/CalendarPDFViewer';
 
 const YEAR = 2026;
 const DEFAULT_MONTHS = [
@@ -306,7 +307,13 @@ export const CalendarPage = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+
+      <div className="border-t border-gray-200 pt-10">
+        <h2 className="text-2xl font-serif font-bold mb-6 text-center">Download Calendar PDF</h2>
+        <CalendarPDFViewer />
+      </div>
+    </div >
   );
 };
 
