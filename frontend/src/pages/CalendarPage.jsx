@@ -144,9 +144,8 @@ export const CalendarPage = () => {
               setSelectedDate(dayjs(new Date(Date.UTC(YEAR, idx, 1))));
               resetForm();
             }}
-            className={`px-3 py-1 rounded-full text-sm ${
-              idx === month ? 'bg-primary text-white' : 'bg-white border border-gray-200 text-gray-600'
-            }`}
+            className={`px-3 py-1 rounded-full text-sm ${idx === month ? 'bg-primary text-white' : 'bg-white border border-gray-200 text-gray-600'
+              }`}
           >
             {label}
           </button>
@@ -171,9 +170,8 @@ export const CalendarPage = () => {
                   type="button"
                   key={`${month}-${idx}`}
                   onClick={() => handleDayClick(day)}
-                  className={`min-h-[90px] rounded-xl border text-left px-3 py-2 ${
-                    isSelected ? 'border-primary bg-primary/5' : 'border-gray-200 bg-white'
-                  } ${day === null ? 'pointer-events-none bg-transparent border-none' : ''}`}
+                  className={`min-h-[90px] rounded-xl border text-left px-3 py-2 ${isSelected ? 'border-primary bg-primary/5' : 'border-gray-200 bg-white'
+                    } ${day === null ? 'pointer-events-none bg-transparent border-none' : ''}`}
                 >
                   {day && <span className="font-semibold">{day}</span>}
                   <div className="mt-2 space-y-1">
@@ -215,9 +213,8 @@ export const CalendarPage = () => {
               {selectedEvents.map((event) => (
                 <div
                   key={event.id}
-                  className={`p-3 rounded-xl border cursor-pointer ${
-                    editingEvent?.id === event.id ? 'border-primary' : 'border-gray-200'
-                  }`}
+                  className={`p-3 rounded-xl border cursor-pointer ${editingEvent?.id === event.id ? 'border-primary' : 'border-gray-200'
+                    }`}
                   onClick={() => startEdit(event)}
                 >
                   <p className="font-semibold">{event.title}</p>
@@ -307,7 +304,7 @@ export const CalendarPage = () => {
           </div>
         </div>
       </div>
-      </div>
+
 
       <div className="border-t border-gray-200 pt-10">
         <h2 className="text-2xl font-serif font-bold mb-6 text-center">Download Calendar PDF</h2>
