@@ -143,7 +143,7 @@ export const CategoryPage = () => {
 
       {/* For calendar category, only show PDFs - no articles */}
       {slug === 'calendar' ? (
-        <PDFSection />
+        <CalendarPDFViewer />
       ) : (
         <>
           <section className="space-y-4 sm:space-y-6">

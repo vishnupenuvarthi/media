@@ -19,61 +19,37 @@ export const router = createBrowserRouter([
     path: '/',
     element: <AppLayout />,
     children: [
-      { 
-        index: true, 
-        element: (
-          <RequireAuth>
-            <HomePage />
-          </RequireAuth>
-        )
+      {
+        index: true,
+        element: <HomePage />
       },
-      { 
-        path: 'calendar', 
+      {
+        path: 'calendar',
         element: <CalendarPage />
       },
-      { 
-        path: 'youtube', 
+      {
+        path: 'youtube',
         element: <YouTubePage />
       },
-      { 
-        path: 'breaking', 
-        element: (
-          <RequireAuth>
-            <BreakingNewsPage />
-          </RequireAuth>
-        )
+      {
+        path: 'breaking',
+        element: <BreakingNewsPage />
       },
-      { 
-        path: 'category/tag/:tag', 
-        element: (
-          <RequireAuth>
-            <CategoryPage />
-          </RequireAuth>
-        )
+      {
+        path: 'category/tag/:tag',
+        element: <CategoryPage />
       },
-      { 
-        path: 'category/:slug', 
-        element: (
-          <RequireAuth>
-            <CategoryPage />
-          </RequireAuth>
-        )
+      {
+        path: 'category/:slug',
+        element: <CategoryPage />
       },
-      { 
-        path: 'article/:slug', 
-        element: (
-          <RequireAuth>
-            <ArticlePage />
-          </RequireAuth>
-        ) 
+      {
+        path: 'article/:slug',
+        element: <ArticlePage />
       },
-      { 
-        path: 'live/:slug', 
-        element: (
-          <RequireAuth>
-            <LivePage />
-          </RequireAuth>
-        ) 
+      {
+        path: 'live/:slug',
+        element: <LivePage />
       },
       { path: 'login', element: <LoginPage /> },
       { path: 'register', element: <RegisterPage /> },
