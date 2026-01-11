@@ -134,6 +134,10 @@ export const getNLRCalendarPdf = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: 'PDF file missing on server' });
     }
 
+    // Cache the PDF for 1 day (86400 seconds)
+    // This significantly speeds up subsequent loads
+    res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
+
     res.sendFile(pdfPath, (err) => {
       if (err) {
         console.error('Error serving PDF:', err);

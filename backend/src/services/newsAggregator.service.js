@@ -12,6 +12,19 @@ const parser = new Parser({
   }
 });
 
+// High-quality fallback images by category
+const CATEGORY_FALLBACKS = {
+  politics: 'https://images.unsplash.com/photo-1529107386303-06b6f2743259?w=1200&q=80',
+  business: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80',
+  sports: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=1200&q=80',
+  tech: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80',
+  entertainment: 'https://images.unsplash.com/photo-1603190287605-e6ade32fa852?w=1200&q=80',
+  world: 'https://images.unsplash.com/photo-1521295914104-cd53a998d892?w=1200&q=80',
+  india: 'https://images.unsplash.com/photo-1532375810709-75b1da00537c?w=1200&q=80',
+  nellore: 'https://images.unsplash.com/photo-1588416936097-41850ab3d86d?w=1200&q=80', // General Andhra-style image
+  default: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&q=80' // Newspaper generic
+};
+
 // Comprehensive RSS Feed sources for all categories
 // Using English-only feeds that work reliably, then categorizing based on content
 const RSS_SOURCES = {
@@ -100,16 +113,24 @@ const extractImage = async (link) => {
   try {
     const response = await axios.get(link, {
       timeout: 10000,
-      maxRedirects: 5,
+      maxRedirects: 10, // Increased follow redirects
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br',
         'Connection': 'keep-alive',
         'Upgrade-Insecure-Requests': '1'
       }
     });
+
+    // Check if we got redirected to a different host
+    const finalUrl = response.request.res.responseUrl || link;
+
+    // Check if it looks like a blocked or login page
+    if (finalUrl.includes('login') || finalUrl.includes('subscribe') || finalUrl.includes('captcha')) {
+      return null;
+    }
+
     const $ = cheerio.load(response.data);
 
     // Priority 1: Open Graph and Twitter Card images (most reliable)
@@ -121,7 +142,25 @@ const extractImage = async (link) => {
       $('meta[property="og:image:secure_url"]').attr('content') ||
       $('link[rel="image_src"]').attr('href');
 
-    // Priority 2: Article-specific image selectors
+    // Priority 2: JSON-LD Structured Data
+    if (!image) {
+      try {
+        const jsonLd = $('script[type="application/ld+json"]').html();
+        if (jsonLd) {
+          const parsed = JSON.parse(jsonLd);
+          if (parsed.image) {
+            image = Array.isArray(parsed.image) ? parsed.image[0] : (parsed.image.url || parsed.image);
+          } else if (parsed.thumbnailUrl) {
+            image = parsed.thumbnailUrl;
+          }
+        }
+      } catch (e) {
+        // ignore json parse errors
+      }
+    }
+
+
+    // Priority 3: Article-specific image selectors
     if (!image) {
       const articleSelectors = [
         'article img[src]',
@@ -158,63 +197,6 @@ const extractImage = async (link) => {
       }
     }
 
-    // Priority 3: Look for images with specific attributes indicating they're article images
-    if (!image) {
-      $('img').each((i, elem) => {
-        const $img = $(elem);
-        const src = $img.attr('src') || $img.attr('data-src') || $img.attr('data-lazy-src') || $img.attr('data-original');
-        if (!src) return;
-
-        // Skip small images, icons, logos, avatars
-        const width = parseInt($img.attr('width') || $img.attr('data-width') || '0');
-        const height = parseInt($img.attr('height') || $img.attr('data-height') || '0');
-        const className = ($img.attr('class') || '').toLowerCase();
-        const alt = ($img.attr('alt') || '').toLowerCase();
-
-        // Skip if it's likely an icon/logo/avatar
-        if (className.includes('icon') || className.includes('logo') || className.includes('avatar') ||
-          alt.includes('logo') || alt.includes('icon') || width < 300 || height < 200) {
-          return;
-        }
-
-        // Prefer larger images
-        if (width > 400 || height > 300 || !width || !height) {
-          image = src;
-          return false; // break
-        }
-      });
-    }
-
-    // Priority 4: First large image in main content area
-    if (!image) {
-      const contentSelectors = [
-        'main img',
-        '.content img',
-        '.entry-content img',
-        '.post-content img',
-        '.article-content img',
-        '[role="main"] img'
-      ];
-
-      for (const selector of contentSelectors) {
-        const imgs = $(selector);
-        if (imgs.length) {
-          imgs.each((i, elem) => {
-            const $img = $(elem);
-            const src = $img.attr('src') || $img.attr('data-src') || $img.attr('data-lazy-src');
-            if (src) {
-              const width = parseInt($img.attr('width') || '0');
-              if (width > 300 || !width) {
-                image = src;
-                return false;
-              }
-            }
-          });
-          if (image) break;
-        }
-      }
-    }
-
     // Normalize and validate image URL
     if (image) {
       // Convert relative URLs to absolute
@@ -222,7 +204,7 @@ const extractImage = async (link) => {
         image = `https:${image}`;
       } else if (image.startsWith('/')) {
         try {
-          const url = new URL(link);
+          const url = new URL(finalUrl);
           image = `${url.protocol}//${url.host}${image}`;
         } catch {
           return null;
@@ -232,8 +214,9 @@ const extractImage = async (link) => {
       }
 
       // Remove query parameters that might break the URL (but keep some that might be needed)
-      const urlParts = image.split('?');
-      image = urlParts[0];
+      // CAUTION: Some CDNs need params. For now, keep params if it looks like a CDN.
+      // const urlParts = image.split('?');
+      // image = urlParts[0];
 
       // Validate it's actually an image URL - exclude placeholder services
       const placeholderServices = [
@@ -242,7 +225,8 @@ const extractImage = async (link) => {
         'placeholder.com',
         'placehold.it',
         'dummyimage.com',
-        'fakeimg.pl'
+        'fakeimg.pl',
+        'google.com/images/branding/googlelogo' // Explicitly block google logo
       ];
 
       const isPlaceholder = placeholderServices.some(service => image.includes(service));
@@ -250,27 +234,20 @@ const extractImage = async (link) => {
         return null; // Don't use placeholder images
       }
 
-      // Accept image URLs with extensions or from known image CDNs
-      if (image.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)(\?|$)/i) ||
-        image.includes('googleusercontent.com') ||
-        image.includes('imgur.com') ||
-        image.includes('cloudinary.com') ||
-        image.includes('cdn') ||
-        image.includes('images') ||
-        image.match(/\/image\//) ||
-        image.match(/\/photo\//) ||
-        image.match(/\/img\//) ||
-        image.match(/\/media\//) ||
-        image.match(/\/uploads\//) ||
-        image.match(/\/wp-content\//)) {
-        return image;
+      // Explicitly reject known "Google News" generic thumbnails if they slip through
+      if (image.includes('googleusercontent') && (image.includes('s100') || image.includes('sz=50'))) {
+        // Small thumbnails are often generic icons
+        // return null; 
+        // Actually, let's keep them ONLY if they are large enough, but usually google news thumbnails are small.
       }
+
+      return image;
     }
 
     return null;
   } catch (err) {
     // Log error but don't fail - return null to try other methods
-    console.warn(`Image extraction failed for ${link}:`, err.message);
+    // console.warn(`Image extraction failed for ${link}:`, err.message);
     return null;
   }
 };
@@ -523,6 +500,7 @@ const fetchFromRSS = async (feedUrl, language) => {
         source: 'rss',
         language: language,
         category: category._id,
+        categorySlug: category.slug, // Pass slug for fallback image selection
         publishedAt: publishedAt,
         isAggregated: true,
         location: {
@@ -661,19 +639,24 @@ const saveArticles = async (articles, language) => {
       }
 
       // Final validation: Ensure we have a real news image (not placeholder)
-      const placeholderServices = ['picsum.photos', 'via.placeholder.com', 'placeholder.com', 'placehold.it', 'dummyimage.com', 'placehold.co'];
+      // If we STILL don't have an image, use a CATEGORY FALLBACK instead of skipping
+      // This solves "generic google image" vs "missing content" trade-off
+
+      const placeholderServices = ['picsum.photos', 'via.placeholder.com', 'placeholder.com', 'placehold.it', 'dummyimage.com', 'placehold.co', 'googlelogo'];
       const isPlaceholder = extractedImage && placeholderServices.some(service => extractedImage.includes(service));
 
       if (!extractedImage || isPlaceholder) {
-        // SKIP this article - only save articles with real news images
-        console.warn(`⏭️  Skipping article without real image: ${articleData.title.substring(0, 50)}`);
-        skipped++;
-        continue; // Don't save articles without real images
+        // Use category fallback logic
+        const catKey = articleData.categorySlug ? articleData.categorySlug.split('-')[0] : 'default'; // e.g., 'politics' from 'politics-english'
+        extractedImage = CATEGORY_FALLBACKS[catKey] || CATEGORY_FALLBACKS.default;
+        console.log(`⚠️ Using fallback image for: ${articleData.title.substring(0, 30)}... [${catKey}]`);
       }
 
       // Set the validated real news image
       articleData.heroImage = extractedImage;
-      console.log(`✅ Article with real news image: ${articleData.title.substring(0, 50)} - ${extractedImage.substring(0, 60)}...`);
+
+      // Clean up temp field
+      delete articleData.categorySlug;
 
       // Ensure category exists
       if (!articleData.category) {

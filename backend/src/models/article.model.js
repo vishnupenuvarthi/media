@@ -16,7 +16,7 @@ const ArticleSchema = new Schema(
       default: 'draft',
       index: true
     },
-    author: { type: Schema.Types.ObjectId, ref: 'User', required: function() { return !this.isAggregated; } },
+    author: { type: Schema.Types.ObjectId, ref: 'User', required: function () { return !this.isAggregated; } },
     editor: { type: Schema.Types.ObjectId, ref: 'User' },
     stats: {
       views: { type: Number, default: 0 },
@@ -27,7 +27,7 @@ const ArticleSchema = new Schema(
       isBreaking: { type: Boolean, default: false },
       isTopHeadline: { type: Boolean, default: false }
     },
-    publishedAt: Date,
+    publishedAt: { type: Date, index: true },
     scheduledAt: Date,
     // New fields for dynamic news aggregation
     language: {
