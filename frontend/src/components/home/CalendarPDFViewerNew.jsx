@@ -12,7 +12,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 export const CalendarPDFViewerNew = () => {
     // Debug Log
-    useEffect(() => { console.log("CalendarPDFViewerNew v1300.0 SIDE NAV Loaded"); }, []);
+    useEffect(() => { console.log("CalendarPDFViewerNew v1400.0 PRO DOCK Loaded"); }, []);
 
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -182,71 +182,75 @@ export const CalendarPDFViewerNew = () => {
                                     />
                                 </TransformComponent>
 
-                                {/* Floating Zoom Controls (Ghost Mode: Transparent until hovered) */}
-                                <div className="absolute top-20 right-4 flex flex-col gap-2 z-20 transition-opacity duration-300 opacity-30 hover:opacity-100">
-                                    <button onClick={() => zoomIn()} className="p-2 bg-black/40 backdrop-blur-md text-white rounded-full shadow-lg hover:bg-black/80">
-                                        <MagnifyingGlassPlusIcon className="w-5 h-5" />
-                                    </button>
-                                    <button onClick={() => zoomOut()} className="p-2 bg-black/40 backdrop-blur-md text-white rounded-full shadow-lg hover:bg-black/80">
-                                        <MagnifyingGlassMinusIcon className="w-5 h-5" />
-                                    </button>
-                                    <button onClick={() => resetTransform()} className="p-2 bg-black/40 backdrop-blur-md text-white rounded-full shadow-lg hover:bg-black/80">
-                                        <ArrowsPointingOutIcon className="w-5 h-5" />
-                                    </button>
-                                </div>
+                                {/* Bottom Tools Dock (Zoom + Page + Download) */}
+                                {!loading && numPages && (
+                                    <div className="absolute bottom-6 left-4 right-4 z-40">
+                                        <div className="bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-3 flex items-center justify-between gap-2 max-w-md mx-auto">
+
+                                            {/* Zoom Group */}
+                                            <div className="flex items-center gap-1 bg-white/10 rounded-lg p-1">
+                                                <button onClick={() => zoomOut()} className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-md transition-all active:scale-95 disabled:opacity-30" disabled={state.scale <= 1}>
+                                                    <MagnifyingGlassMinusIcon className="w-5 h-5" />
+                                                </button>
+                                                <div className="w-px h-4 bg-white/10"></div>
+                                                <button onClick={() => zoomIn()} className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-md transition-all active:scale-95" disabled={state.scale >= 4}>
+                                                    <MagnifyingGlassPlusIcon className="w-5 h-5" />
+                                                </button>
+                                            </div>
+
+                                            {/* Page Indicator */}
+                                            <div className="flex flex-col items-center">
+                                                <span className="text-white font-bold font-mono text-sm tracking-widest">
+                                                    {pageNumber} / {numPages}
+                                                </span>
+                                                <span className="text-[9px] text-fuchsia-400 font-bold uppercase tracking-wider">
+                                                    v1400.0 PRO
+                                                </span>
+                                            </div>
+
+                                            {/* Download & Reset */}
+                                            <div className="flex items-center gap-1">
+                                                <button onClick={() => resetTransform()} className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-md transition-all active:scale-95">
+                                                    <ArrowsPointingOutIcon className="w-5 h-5" />
+                                                </button>
+                                                <a
+                                                    href={pdfUrl}
+                                                    download="NLR-News-Calendar-2026.pdf"
+                                                    className="p-2 bg-primary/90 hover:bg-primary text-white rounded-lg shadow-lg shadow-primary/20 active:scale-95 transition-all"
+                                                >
+                                                    <ArrowDownTrayIcon className="w-5 h-5" />
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </TransformWrapper>
                 </Document>
             </div>
 
-            {/* Top Right Download Button (Ghost Mode) */}
-            {!loading && (
-                <a
-                    href={pdfUrl}
-                    download="NLR-News-Calendar-2026.pdf"
-                    className="absolute top-4 right-4 z-40 p-3 bg-white/30 backdrop-blur-sm border border-white/20 rounded-full shadow-sm text-gray-700 hover:bg-white/90 hover:shadow-lg active:scale-95 transition-all opacity-60 hover:opacity-100"
-                >
-                    <ArrowDownTrayIcon className="w-5 h-5" />
-                </a>
-            )}
-
-            {/* Side Navigation Arrows (Ghost Mode) */}
+            {/* Side Navigation Arrows (Ghost Mode) - Vertically Centered */}
             {!loading && numPages && (
                 <>
-                    {/* Left / Previous */}
                     <button
                         onClick={() => changePage(-1)}
                         disabled={pageNumber <= 1}
-                        className="absolute top-1/2 left-4 -translate-y-1/2 z-30 p-4 bg-black/20 hover:bg-black/50 backdrop-blur-sm rounded-full text-white transition-all disabled:opacity-0 active:scale-90"
+                        className="absolute top-1/2 left-4 -translate-y-1/2 z-30 p-3 bg-black/20 hover:bg-black/50 backdrop-blur-sm rounded-full text-white transition-all disabled:opacity-0 active:scale-90"
                     >
                         <ChevronLeftIcon className="w-8 h-8" />
                     </button>
 
-                    {/* Right / Next */}
                     <button
                         onClick={() => changePage(1)}
                         disabled={pageNumber >= numPages}
-                        className="absolute top-1/2 right-4 -translate-y-1/2 z-30 p-4 bg-black/20 hover:bg-black/50 backdrop-blur-sm rounded-full text-white transition-all disabled:opacity-0 active:scale-90"
+                        className="absolute top-1/2 right-4 -translate-y-1/2 z-30 p-3 bg-black/20 hover:bg-black/50 backdrop-blur-sm rounded-full text-white transition-all disabled:opacity-0 active:scale-90"
                     >
                         <ChevronRightIcon className="w-8 h-8" />
                     </button>
                 </>
             )}
-
-            {/* Bottom Page Indicator */}
-            {!loading && numPages && (
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
-                    <div className="bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 shadow-lg">
-                        <span className="font-bold text-white text-sm drop-shadow-md font-mono tracking-widest">
-                            {pageNumber} / {numPages}
-                        </span>
-                    </div>
-                    <span className="text-[9px] text-white/80 font-bold uppercase tracking-wider drop-shadow-md">
-                        v1300.0 SIDE
-                    </span>
-                </div>
-            )}
         </div>
     );
 };
+```
