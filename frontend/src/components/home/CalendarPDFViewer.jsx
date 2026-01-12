@@ -5,13 +5,8 @@ import { ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon } from '@heroicons
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-// Set worker source
-import 'pdfjs-dist/build/pdf.worker.min.mjs';
-
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url,
-).toString();
+// Use CDN worker for better stability on Vercel/Production
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs`;
 
 export const CalendarPDFViewer = () => {
   const [numPages, setNumPages] = useState(null);
