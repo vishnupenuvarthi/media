@@ -5,14 +5,14 @@ import { ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon, ArrowPathIcon, Ma
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-// FIX: Use Reliable CDN worker to match React-PDF 9.x version.
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs`;
+// FIX: Use LOCAL worker to avoid network/CORS issues.
+pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
 
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 export const CalendarPDFViewerNew = () => {
     // Debug Log
-    useEffect(() => { console.log("CalendarPDFViewerNew v1200.0 GHOST UI Loaded"); }, []);
+    useEffect(() => { console.log("CalendarPDFViewerNew v1300.0 STABLE RESTORE Loaded"); }, []);
 
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -76,7 +76,10 @@ export const CalendarPDFViewerNew = () => {
     const pixelRatio = isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.5);
 
     return (
-        <div className="flex flex-col items-center w-full min-h-[500px] bg-gray-50/50 rounded-xl border border-gray-100 relative pb-20">
+        <div
+            className="flex flex-col items-center w-full min-h-[500px] bg-gray-50/50 rounded-xl border border-gray-100 relative pb-20 select-none"
+            onContextMenu={(e) => e.preventDefault()} // Prevent iOS Long Press Menu
+        >
             {/* Viewer Area */}
             <div className="w-full bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden min-h-[500px] flex items-center justify-center relative touch-manipulation">
                 <Document
@@ -227,7 +230,7 @@ export const CalendarPDFViewerNew = () => {
                             {pageNumber} <span className="text-gray-600 font-normal">/ {numPages}</span>
                         </span>
                         <span className="text-[9px] text-fuchsia-600 font-bold uppercase tracking-wider opacity-60 group-hover:opacity-100 transition-opacity">
-                            v1200.0 GHOST
+                            v1300.0 STABLE RESTORE
                         </span>
                     </div>
 
