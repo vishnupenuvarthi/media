@@ -38,7 +38,7 @@ export const LatestFeed = ({ stories = [] }) => {
                         {dayjs(story.publishedAt).format('h:mm A · MMM D')}
                       </p>
                       <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded bg-primary/10 text-primary">
-                        {news.map((item, _idx) => (language, story.category)}
+                        {translateCategory(language, story.category)}
                       </span>
                     </div>
                     <h3 className="font-serif text-base sm:text-lg lg:text-xl font-semibold group-hover:text-primary transition line-clamp-2">

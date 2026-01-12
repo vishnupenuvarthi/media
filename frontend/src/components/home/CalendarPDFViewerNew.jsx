@@ -58,6 +58,11 @@ export const CalendarPDFViewerNew = () => {
         setLoading(false);
     }
 
+    // Restored to fix undefined error
+    const onPageLoadSuccess = () => {
+        // setIsPageLoaded(true);
+    };
+
     const options = useMemo(() => ({
         cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/cmaps/',
         cMapPacked: true,
@@ -72,6 +77,7 @@ export const CalendarPDFViewerNew = () => {
             setSlideDirection(offset > 0 ? 'right' : 'left');
             // Small delay to reset animation class if needed, but key change handles it
             setPageNumber(newPage);
+            // setIsPageLoaded(false);
         }
     };
 
@@ -160,7 +166,7 @@ export const CalendarPDFViewerNew = () => {
                         panning={{ disabled: scale === 1 }} // Disable panning if unzoomed to allow native scroll
                         wheel={{ disabled: true }} // Disable mouse wheel zoom to allow page scroll
                         doubleClick={{ disabled: true }}
-                        onPanning={(ref, event) => {
+                        onPanning={() => {
                             // Allow swipe logic if needed, but react-zoom-pan-pinch handles panning
                         }}
                     >
