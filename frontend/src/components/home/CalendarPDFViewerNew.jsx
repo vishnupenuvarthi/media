@@ -10,7 +10,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
 
 export const CalendarPDFViewerNew = () => {
     // Debug Log
-    useEffect(() => { console.log("CalendarPDFViewerNew v50.0 ULTRAMAX Loaded"); }, []);
+    useEffect(() => { console.log("CalendarPDFViewerNew v100.0 HYPER Loaded"); }, []);
 
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -142,7 +142,7 @@ export const CalendarPDFViewerNew = () => {
                         touchStartX.current = null;
                     }}
                 >
-                    {/* Main Page */}
+                    {/* Main Page - Always Visible */}
                     <div className="transform-gpu will-change-transform">
                         <Page
                             key={`page_${pageNumber}`}
@@ -162,8 +162,8 @@ export const CalendarPDFViewerNew = () => {
                         />
                     </div>
 
-                    {/* Pre-load NEXT page (Hidden) */}
-                    {isPageLoaded && pageNumber < numPages && (
+                    {/* Pre-load NEXT page (Always Mounted, Hidden) - INSTANT NEXT */}
+                    {pageNumber < numPages && (
                         <div style={{ display: 'none' }}>
                             <Page
                                 key={`preload_next_${pageNumber + 1}`}
@@ -177,8 +177,23 @@ export const CalendarPDFViewerNew = () => {
                         </div>
                     )}
 
-                    {/* Pre-load PREVIOUS page (Hidden) */}
-                    {isPageLoaded && pageNumber > 1 && (
+                    {/* Pre-load NEXT+1 page (Aggressive Cache) */}
+                    {pageNumber + 1 < numPages && (
+                        <div style={{ display: 'none' }}>
+                            <Page
+                                key={`preload_next2_${pageNumber + 2}`}
+                                pageNumber={pageNumber + 2}
+                                width={containerWidth}
+                                renderTextLayer={false}
+                                renderAnnotationLayer={false}
+                                cleanupAfterRender={false}
+                                pixelRatio={pixelRatio}
+                            />
+                        </div>
+                    )}
+
+                    {/* Pre-load PREVIOUS page (Always Mounted, Hidden) - INSTANT BACK */}
+                    {pageNumber > 1 && (
                         <div style={{ display: 'none' }}>
                             <Page
                                 key={`preload_prev_${pageNumber - 1}`}
@@ -220,7 +235,7 @@ export const CalendarPDFViewerNew = () => {
                             >
                                 <ArrowDownTrayIcon className="w-3 h-3" /> Download PDF
                             </a>
-                            <span className="text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full ring-1 ring-red-100 animate-pulse">v50.0 ULTRAMAX</span>
+                            <span className="text-[10px] text-fuchsia-600 font-bold bg-fuchsia-50 px-2 py-0.5 rounded-full ring-1 ring-fuchsia-100 animate-pulse">v100.0 HYPER</span>
                         </div>
                     </div>
 
