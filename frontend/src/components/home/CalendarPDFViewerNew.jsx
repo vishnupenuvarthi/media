@@ -12,7 +12,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 export const CalendarPDFViewerNew = () => {
     // Debug Log
-    useEffect(() => { console.log("CalendarPDFViewerNew v1100.0 UI POLISH Loaded"); }, []);
+    useEffect(() => { console.log("CalendarPDFViewerNew v1200.0 GHOST UI Loaded"); }, []);
 
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -182,15 +182,15 @@ export const CalendarPDFViewerNew = () => {
                                     />
                                 </TransformComponent>
 
-                                {/* Floating Zoom Controls (Visible when zoomed or on interaction) */}
-                                <div className="absolute top-20 right-4 flex flex-col gap-2 z-20">
-                                    <button onClick={() => zoomIn()} className="p-2 bg-black/50 backdrop-blur text-white rounded-full shadow-lg">
+                                {/* Floating Zoom Controls (Ghost Mode: Transparent until hovered) */}
+                                <div className="absolute top-20 right-4 flex flex-col gap-2 z-20 transition-opacity duration-300 opacity-30 hover:opacity-100">
+                                    <button onClick={() => zoomIn()} className="p-2 bg-black/40 backdrop-blur-md text-white rounded-full shadow-lg hover:bg-black/80">
                                         <MagnifyingGlassPlusIcon className="w-5 h-5" />
                                     </button>
-                                    <button onClick={() => zoomOut()} className="p-2 bg-black/50 backdrop-blur text-white rounded-full shadow-lg">
+                                    <button onClick={() => zoomOut()} className="p-2 bg-black/40 backdrop-blur-md text-white rounded-full shadow-lg hover:bg-black/80">
                                         <MagnifyingGlassMinusIcon className="w-5 h-5" />
                                     </button>
-                                    <button onClick={() => resetTransform()} className="p-2 bg-black/50 backdrop-blur text-white rounded-full shadow-lg">
+                                    <button onClick={() => resetTransform()} className="p-2 bg-black/40 backdrop-blur-md text-white rounded-full shadow-lg hover:bg-black/80">
                                         <ArrowsPointingOutIcon className="w-5 h-5" />
                                     </button>
                                 </div>
@@ -200,41 +200,41 @@ export const CalendarPDFViewerNew = () => {
                 </Document>
             </div>
 
-            {/* Top Right Download Button */}
+            {/* Top Right Download Button (Ghost Mode) */}
             {!loading && (
                 <a
                     href={pdfUrl}
                     download="NLR-News-Calendar-2026.pdf"
-                    className="absolute top-4 right-4 z-40 p-3 bg-white/90 backdrop-blur-md border border-gray-100 rounded-full shadow-lg text-gray-700 hover:text-primary active:scale-95 transition-all"
+                    className="absolute top-4 right-4 z-40 p-3 bg-white/30 backdrop-blur-sm border border-white/20 rounded-full shadow-sm text-gray-700 hover:bg-white/90 hover:shadow-lg active:scale-95 transition-all opacity-60 hover:opacity-100"
                 >
                     <ArrowDownTrayIcon className="w-5 h-5" />
                 </a>
             )}
 
-            {/* Modern Floating Navigation Pill */}
+            {/* Modern Floating Navigation Pill (Ghost Mode) */}
             {!loading && numPages && (
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 bg-white/90 backdrop-blur-xl border border-gray-200/50 shadow-2xl rounded-full px-2 py-2 pr-6">
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 bg-white/40 backdrop-blur-md border border-white/20 shadow-lg hover:shadow-2xl rounded-full px-2 py-2 pr-6 transition-all duration-300 hover:bg-white/90 group">
                     <button
                         onClick={() => changePage(-1)}
                         disabled={pageNumber <= 1}
-                        className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 disabled:opacity-30 active:scale-90 transition-all"
+                        className="w-10 h-10 flex items-center justify-center bg-white/50 hover:bg-gray-200 rounded-full text-gray-800 disabled:opacity-30 active:scale-90 transition-all shadow-sm"
                     >
                         <ChevronLeftIcon className="w-5 h-5" />
                     </button>
 
-                    <div className="flex flex-col items-center min-w-[80px]">
-                        <span className="font-bold text-gray-900 text-sm">
-                            {pageNumber} <span className="text-gray-400 font-normal">/ {numPages}</span>
+                    <div className="flex flex-col items-center min-w-[80px] opacity-80 group-hover:opacity-100 transition-opacity">
+                        <span className="font-bold text-gray-900 text-sm drop-shadow-sm">
+                            {pageNumber} <span className="text-gray-600 font-normal">/ {numPages}</span>
                         </span>
-                        <span className="text-[9px] text-fuchsia-500 font-bold uppercase tracking-wider">
-                            v1100.0 UI
+                        <span className="text-[9px] text-fuchsia-600 font-bold uppercase tracking-wider">
+                            v1200.0 GHOST
                         </span>
                     </div>
 
                     <button
                         onClick={() => changePage(1)}
                         disabled={pageNumber >= numPages}
-                        className="w-10 h-10 flex items-center justify-center bg-black text-white hover:bg-gray-800 rounded-full shadow-lg shadow-black/20 disabled:opacity-30 disabled:shadow-none active:scale-90 transition-all"
+                        className="w-10 h-10 flex items-center justify-center bg-black/80 text-white hover:bg-black rounded-full shadow-lg disabled:opacity-30 disabled:shadow-none active:scale-90 transition-all"
                     >
                         <ChevronRightIcon className="w-5 h-5" />
                     </button>
