@@ -12,7 +12,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 export const CalendarPDFViewerNew = () => {
     // Debug Log
-    useEffect(() => { console.log("CalendarPDFViewerNew v1000.0 PINCH+SWIPE Loaded"); }, []);
+    useEffect(() => { console.log("CalendarPDFViewerNew v1100.0 UI POLISH Loaded"); }, []);
 
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -183,7 +183,7 @@ export const CalendarPDFViewerNew = () => {
                                 </TransformComponent>
 
                                 {/* Floating Zoom Controls (Visible when zoomed or on interaction) */}
-                                <div className="absolute top-4 right-4 flex flex-col gap-2 z-20">
+                                <div className="absolute top-20 right-4 flex flex-col gap-2 z-20">
                                     <button onClick={() => zoomIn()} className="p-2 bg-black/50 backdrop-blur text-white rounded-full shadow-lg">
                                         <MagnifyingGlassPlusIcon className="w-5 h-5" />
                                     </button>
@@ -200,36 +200,43 @@ export const CalendarPDFViewerNew = () => {
                 </Document>
             </div>
 
-            {/* Professional Mobile Bottom Bar (Fixed) */}
+            {/* Top Right Download Button */}
+            {!loading && (
+                <a
+                    href={pdfUrl}
+                    download="NLR-News-Calendar-2026.pdf"
+                    className="absolute top-4 right-4 z-40 p-3 bg-white/90 backdrop-blur-md border border-gray-100 rounded-full shadow-lg text-gray-700 hover:text-primary active:scale-95 transition-all"
+                >
+                    <ArrowDownTrayIcon className="w-5 h-5" />
+                </a>
+            )}
+
+            {/* Modern Floating Navigation Pill */}
             {!loading && numPages && (
-                <div className="absolute bottom-4 left-4 right-4 bg-gray-900/90 backdrop-blur-md text-white rounded-2xl p-4 shadow-2xl flex items-center justify-between border border-white/10 z-30">
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 bg-white/90 backdrop-blur-xl border border-gray-200/50 shadow-2xl rounded-full px-2 py-2 pr-6">
                     <button
                         onClick={() => changePage(-1)}
                         disabled={pageNumber <= 1}
-                        className="p-3 bg-white/10 rounded-xl active:bg-white/20 transition-colors disabled:opacity-30"
+                        className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-full text-gray-700 disabled:opacity-30 active:scale-90 transition-all"
                     >
-                        <ChevronLeftIcon className="w-6 h-6" />
+                        <ChevronLeftIcon className="w-5 h-5" />
                     </button>
 
-                    <div className="flex flex-col items-center">
-                        <span className="font-bold text-lg font-serif tracking-wide">
-                            Page {pageNumber} <span className="text-gray-400 text-sm font-normal">of {numPages}</span>
+                    <div className="flex flex-col items-center min-w-[80px]">
+                        <span className="font-bold text-gray-900 text-sm">
+                            {pageNumber} <span className="text-gray-400 font-normal">/ {numPages}</span>
                         </span>
-                        <a
-                            href={pdfUrl}
-                            download="NLR-News-Calendar-2026.pdf"
-                            className="text-[10px] text-primary font-bold uppercase tracking-widest mt-0.5"
-                        >
-                            Download PDF
-                        </a>
+                        <span className="text-[9px] text-fuchsia-500 font-bold uppercase tracking-wider">
+                            v1100.0 UI
+                        </span>
                     </div>
 
                     <button
                         onClick={() => changePage(1)}
                         disabled={pageNumber >= numPages}
-                        className="p-3 bg-white/10 rounded-xl active:bg-white/20 transition-colors disabled:opacity-30"
+                        className="w-10 h-10 flex items-center justify-center bg-black text-white hover:bg-gray-800 rounded-full shadow-lg shadow-black/20 disabled:opacity-30 disabled:shadow-none active:scale-90 transition-all"
                     >
-                        <ChevronRightIcon className="w-6 h-6" />
+                        <ChevronRightIcon className="w-5 h-5" />
                     </button>
                 </div>
             )}
