@@ -37,6 +37,7 @@ export const CalendarPDFViewerNew = () => {
     const [key, setKey] = useState(0);
     const [isPageLoaded, setIsPageLoaded] = useState(false);
     const [slideDirection, setSlideDirection] = useState('right'); // 'right' or 'left'
+    const [scale, setScale] = useState(1); // Track scale to toggle panning
 
     // Swipe Refs
     const touchStartX = useRef(null);
@@ -86,6 +87,7 @@ export const CalendarPDFViewerNew = () => {
         setErrorMsg(null);
         setLoadProgress(0);
         setKey(prev => prev + 1);
+        setScale(1);
     };
 
     // iOS Optimization: Cap pixelRatio at 1.0 for mobile to prevent Canvas OOM
@@ -100,7 +102,10 @@ export const CalendarPDFViewerNew = () => {
             <style>{slideStyles}</style>
 
             {/* Viewer Area */}
-            <div className="w-full bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden min-h-[500px] flex items-center justify-center relative touch-manipulation">
+            <div
+                className={`w-full bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden min-h-[500px] flex items-center justify-center relative touch-manipulation custom-scrollbar ${scale === 1 ? 'touch-pan-y' : 'touch-none'}`}
+                style={{ touchAction: scale === 1 ? 'pan-y' : 'none' }}
+            >
                 <Document
                     key={key}
                     file={pdfUrl}
@@ -160,6 +165,10 @@ export const CalendarPDFViewerNew = () => {
                         minScale={1}
                         maxScale={4}
                         centerOnInit
+                        onTransformed={(ref) => setScale(ref.state.scale)} // Track Scale
+                        panning={{ disabled: scale === 1 }} // Disable panning if unzoomed to allow native scroll
+                        wheel={{ disabled: true }} // Disable mouse wheel zoom to allow page scroll
+                        doubleClick={{ disabled: true }}
                         onPanning={(ref, event) => {
                             // Allow swipe logic if needed, but react-zoom-pan-pinch handles panning
                         }}
