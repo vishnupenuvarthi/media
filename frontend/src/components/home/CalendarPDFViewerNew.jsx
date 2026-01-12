@@ -5,13 +5,12 @@ import { ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon, ArrowPathIcon } f
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-// FIX: Use CDN worker v4.4.168 to match React-PDF 9.x version.
-// Using unpkg which is often more reliable than jsdelivr for old versions.
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs`;
+// FIX: Use LOCAL worker v4.4.168 to avoid iOS Cross-Origin Worker blocks
+pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
 
 export const CalendarPDFViewerNew = () => {
-    // Debug Log to confirm version loaded
-    useEffect(() => { console.log("CalendarPDFViewerNew v6.0 Speed Loaded"); }, []);
+    // Debug Log
+    useEffect(() => { console.log("CalendarPDFViewerNew v7.0 iOS+Speed Loaded"); }, []);
 
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -20,6 +19,7 @@ export const CalendarPDFViewerNew = () => {
     const [loadProgress, setLoadProgress] = useState(0);
     const [containerWidth, setContainerWidth] = useState(600);
     const [key, setKey] = useState(0);
+    const [isPageLoaded, setIsPageLoaded] = useState(false); // Track if current page is done
     const touchStartX = useRef(null);
 
     const pdfUrl = `${getBackendUrl()}/api/calendar/download-pdf`;
@@ -40,16 +40,24 @@ export const CalendarPDFViewerNew = () => {
         setLoading(false);
     }
 
+    const onPageLoadSuccess = () => {
+        setIsPageLoaded(true);
+    };
+
     const options = useMemo(() => ({
         cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/cmaps/',
         cMapPacked: true,
-        disableAutoFetch: true, // Critical for Range Requests
-        disableStream: true,    // Critical for Range Requests
+        disableAutoFetch: true,
+        disableStream: true,
         disableFontFace: true,
     }), []);
 
     const changePage = (offset) => {
-        setPageNumber(prev => Math.min(Math.max(1, prev + offset), numPages || 1));
+        const newPage = Math.min(Math.max(1, pageNumber + offset), numPages || 1);
+        if (newPage !== pageNumber) {
+            setPageNumber(newPage);
+            setIsPageLoaded(false); // Reset load state for new page
+        }
     };
 
     const handleRetry = () => {
@@ -58,6 +66,10 @@ export const CalendarPDFViewerNew = () => {
         setLoadProgress(0);
         setKey(prev => prev + 1);
     };
+
+    // iOS Optimization: Cap pixelRatio at 1.0 for mobile to prevent Canvas OOM
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const pixelRatio = isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.5);
 
     return (
         <div className="flex flex-col items-center w-full min-h-[500px] bg-gray-50/50 rounded-xl border border-gray-100 relative">
@@ -130,13 +142,16 @@ export const CalendarPDFViewerNew = () => {
                         touchStartX.current = null;
                     }}
                 >
+                    {/* Main Page */}
                     <Page
+                        key={`page_${pageNumber}`}
                         pageNumber={pageNumber}
                         width={containerWidth}
+                        onRenderSuccess={onPageLoadSuccess}
                         renderTextLayer={false}
                         renderAnnotationLayer={false}
                         cleanupAfterRender={true}
-                        pixelRatio={window.devicePixelRatio > 1 ? 1.5 : 1}
+                        pixelRatio={pixelRatio}
                         loading={
                             <div className="h-[500px] w-full flex flex-col items-center justify-center bg-gray-50/50">
                                 <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-400 rounded-full animate-spin mb-4"></div>
@@ -144,6 +159,21 @@ export const CalendarPDFViewerNew = () => {
                             </div>
                         }
                     />
+
+                    {/* Pre-load NEXT page (Hidden) */}
+                    {isPageLoaded && pageNumber < numPages && (
+                        <div style={{ display: 'none' }}>
+                            <Page
+                                key={`preload_${pageNumber + 1}`}
+                                pageNumber={pageNumber + 1}
+                                width={containerWidth}
+                                renderTextLayer={false}
+                                renderAnnotationLayer={false}
+                                cleanupAfterRender={false} // Keep in memory for instant switch
+                                pixelRatio={pixelRatio}
+                            />
+                        </div>
+                    )}
                 </Document>
 
                 {/* Tap Zones for easier navigation */}
@@ -173,7 +203,7 @@ export const CalendarPDFViewerNew = () => {
                             >
                                 <ArrowDownTrayIcon className="w-3 h-3" /> Download PDF
                             </a>
-                            <span className="text-[10px] text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded-full ring-1 ring-green-100">v6.0 SPEED</span>
+                            <span className="text-[10px] text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded-full ring-1 ring-green-100">v7.0 iOS FIX</span>
                         </div>
                     </div>
 
