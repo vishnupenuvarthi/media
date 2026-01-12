@@ -22,7 +22,8 @@ export const CalendarPDFViewer = () => {
   useEffect(() => {
     const checkMobile = () => {
       const width = window.innerWidth;
-      setIsMobile(width < 640);
+      // Treat anything under 1024px (Tablets + Phones) as "Mobile" for this heavy 67MB file
+      setIsMobile(width < 1024);
 
       if (width < 640) {
         setContainerWidth(width - 32);
@@ -38,31 +39,31 @@ export const CalendarPDFViewer = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // MOBILE VIEW: Use Google Docs Viewer for reliable handling of large PDFs (67MB)
+  // MOBILE/TABLET VIEW: Use Native Embed. 
+  // Google Docs Viewer has 25MB limit (fails on 67MB). 
+  // React-PDF crashes memory. 
+  // Native Embed uses OS-level viewer (PDFKit/PDFium) which is most robust.
   if (isMobile) {
-    const googleViewerUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(pdfUrl)}`;
-
     return (
-      <div className="flex flex-col items-center justify-center w-full bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm relative h-[600px]">
-        {loading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 z-10">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mb-3"></div>
-            <p className="text-sm text-gray-500">Loading Mobile Viewer...</p>
+      <div className="flex flex-col items-center justify-center w-full bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm relative h-[80vh]">
+        <object
+          data={pdfUrl}
+          type="application/pdf"
+          className="w-full h-full"
+        >
+          {/* Fallback for Androids/Browsers that don't support inline PDF */}
+          <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+            <p className="text-gray-600 mb-4">Your device prefers to download external large files.</p>
+            <a
+              href={pdfUrl}
+              download="NLR-News-Calendar-2026.pdf"
+              className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all font-semibold"
+            >
+              <ArrowDownTrayIcon className="w-5 h-5" />
+              Download PDF (67MB)
+            </a>
           </div>
-        )}
-        <iframe
-          src={googleViewerUrl}
-          className="w-full h-full border-0"
-          title="Calendar PDF Mobile Viewer"
-          onLoad={() => setLoading(false)}
-          onError={() => setErrorMsg("Google Viewer failed to load.")}
-        />
-        {/* Fallback Link at bottom just in case */}
-        <div className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm p-2 border-t flex justify-center">
-          <a href={pdfUrl} download className="text-xs text-primary font-medium flex items-center gap-1">
-            <ArrowDownTrayIcon className="w-3 h-3" /> Download Original (67MB)
-          </a>
-        </div>
+        </object>
       </div>
     );
   }
