@@ -16,6 +16,7 @@ export const CalendarPDFViewer = () => {
   const [loading, setLoading] = useState(true);
   const [containerWidth, setContainerWidth] = useState(800);
   const [isMobile, setIsMobile] = useState(false);
+  const [useFallback, setUseFallback] = useState(false); // New fallback state
   const [errorMsg, setErrorMsg] = useState(null);
   const touchStartX = useRef(null);
 
@@ -43,11 +44,41 @@ export const CalendarPDFViewer = () => {
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
     setLoading(false);
+    setUseFallback(false);
     setErrorMsg(null);
   }
 
   function changePage(offset) {
     setPageNumber(prevPageNumber => prevPageNumber + offset);
+  }
+
+  // FALLBACK VIEW: If React-PDF crashes (common on mobile with 67MB files), 
+  // show this native iframe instantly.
+  if (useFallback) {
+    return (
+      <div className="flex flex-col items-center justify-center w-full bg-gray-50 rounded-xl overflow-hidden border border-gray-100 shadow-sm h-[80vh] relative">
+        <div className="absolute top-4 left-0 right-0 z-10 flex justify-center pointer-events-none">
+          <span className="bg-black/50 text-white text-xs px-3 py-1 rounded-full backdrop-blur-md">
+            Mobile Viewer (Native)
+          </span>
+        </div>
+        <iframe
+          src={pdfUrl}
+          className="w-full h-full border-0"
+          title="Native PDF Viewer"
+        />
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center z-10 pointer-events-auto">
+          <a
+            href={pdfUrl}
+            download="NLR-News-Calendar-2026.pdf"
+            className="px-4 py-2 bg-white/90 text-primary hover:bg-white rounded-full shadow-lg text-sm font-semibold flex items-center gap-2 backdrop-blur-sm transition-all active:scale-95"
+          >
+            <ArrowDownTrayIcon className="w-4 h-4" />
+            Download if not visible
+          </a>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -56,9 +87,10 @@ export const CalendarPDFViewer = () => {
         file={pdfUrl}
         onLoadSuccess={onDocumentLoadSuccess}
         onLoadError={(error) => {
-          console.error('Error loading PDF:', error);
+          console.error('Error loading PDF, switching to fallback:', error);
           setLoading(false);
-          setErrorMsg("Unable to load PDF viewer. Please download.");
+          // CRITICAL: Switch to fallback iframe immediately on error
+          setUseFallback(true);
         }}
         loading={
           <div className="flex flex-col items-center justify-center h-64 w-full gap-3">
