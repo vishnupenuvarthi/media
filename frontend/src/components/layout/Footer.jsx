@@ -10,8 +10,8 @@ export const Footer = () => {
     <footer className="bg-secondary text-gray-300 mt-12">
       <div className="max-w-6xl mx-auto px-4 py-12 grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
-        <p className="text-xs uppercase tracking-[0.4em] text-gray-500">{translate(language, 'footer.trustline')}</p>
-          <h4 className="text-3xl font-serif font-semibold text-white mt-1">NLR LIVE NEWS</h4>
+          <p className="text-xs uppercase tracking-[0.4em] text-gray-500">{translate(language, 'footer.trustline')}</p>
+          <h4 className="text-3xl font-serif font-semibold text-white mt-1">{translate(language, 'footer.aboutTitle')}</h4>
           <p className="text-sm text-gray-400 mt-4 leading-relaxed">{translate(language, 'footer.aboutDescription')}</p>
           <div className="flex gap-3 mt-5 text-sm">
             {socialLinks.map((item) => (
