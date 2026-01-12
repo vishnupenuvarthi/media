@@ -38,14 +38,33 @@ export const CalendarPDFViewer = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  function onDocumentLoadSuccess({ numPages }) {
-    setNumPages(numPages);
-    setLoading(false);
-    setErrorMsg(null);
-  }
+  // MOBILE VIEW: Use Google Docs Viewer for reliable handling of large PDFs (67MB)
+  if (isMobile) {
+    const googleViewerUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(pdfUrl)}`;
 
-  function changePage(offset) {
-    setPageNumber(prevPageNumber => prevPageNumber + offset);
+    return (
+      <div className="flex flex-col items-center justify-center w-full bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm relative h-[600px]">
+        {loading && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-50 z-10">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mb-3"></div>
+            <p className="text-sm text-gray-500">Loading Mobile Viewer...</p>
+          </div>
+        )}
+        <iframe
+          src={googleViewerUrl}
+          className="w-full h-full border-0"
+          title="Calendar PDF Mobile Viewer"
+          onLoad={() => setLoading(false)}
+          onError={() => setErrorMsg("Google Viewer failed to load.")}
+        />
+        {/* Fallback Link at bottom just in case */}
+        <div className="absolute bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm p-2 border-t flex justify-center">
+          <a href={pdfUrl} download className="text-xs text-primary font-medium flex items-center gap-1">
+            <ArrowDownTrayIcon className="w-3 h-3" /> Download Original (67MB)
+          </a>
+        </div>
+      </div>
+    );
   }
 
   function nextPage() {
