@@ -10,7 +10,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
 
 export const CalendarPDFViewerNew = () => {
     // Debug Log
-    useEffect(() => { console.log("CalendarPDFViewerNew v8.0 INSTANT"); }, []);
+    useEffect(() => { console.log("CalendarPDFViewerNew v50.0 ULTRAMAX Loaded"); }, []);
 
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -220,7 +220,7 @@ export const CalendarPDFViewerNew = () => {
                             >
                                 <ArrowDownTrayIcon className="w-3 h-3" /> Download PDF
                             </a>
-                            <span className="text-[10px] text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded-full ring-1 ring-green-100">v8.0 INSTANT</span>
+                            <span className="text-[10px] text-red-600 font-bold bg-red-50 px-2 py-0.5 rounded-full ring-1 ring-red-100 animate-pulse">v50.0 ULTRAMAX</span>
                         </div>
                     </div>
 
