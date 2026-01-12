@@ -5,14 +5,15 @@ import { ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon } from '@heroicons
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-// Use CDN worker for better stability on Vercel/Production
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs`;
+// Use JSDelivr for better stability and cache hits
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs`;
 
 export const CalendarPDFViewer = () => {
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [loading, setLoading] = useState(true);
   const [containerWidth, setContainerWidth] = useState(800);
+  const [errorMsg, setErrorMsg] = useState(null);
   const touchStartX = useRef(null);
 
   const pdfUrl = `${getBackendUrl()}/api/calendar/download-pdf`;
@@ -21,7 +22,7 @@ export const CalendarPDFViewer = () => {
     const updateWidth = () => {
       const width = window.innerWidth;
       if (width < 640) {
-        setContainerWidth(width - 48); // Mobile padding
+        setContainerWidth(width - 32); // Mobile padding reduced
       } else if (width < 1024) {
         setContainerWidth(width - 64); // Tablet padding
       } else {
@@ -37,6 +38,7 @@ export const CalendarPDFViewer = () => {
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
     setLoading(false);
+    setErrorMsg(null);
   }
 
   function changePage(offset) {
@@ -52,26 +54,32 @@ export const CalendarPDFViewer = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-[400px] bg-white rounded-xl py-6 border border-gray-100 shadow-sm">
+    <div className="flex flex-col items-center justify-center w-full min-h-[400px] bg-white rounded-xl py-6 border border-gray-100 shadow-sm relative">
       <Document
         file={pdfUrl}
         onLoadSuccess={onDocumentLoadSuccess}
         onLoadError={(error) => {
           console.error('Error loading PDF:', error);
           setLoading(false);
+          // Check if it's likely a size/memory issue
+          if (window.innerWidth < 640) {
+            setErrorMsg("File is large (67MB). Please download to view.");
+          } else {
+            setErrorMsg("Unable to load PDF viewer.");
+          }
         }}
         loading={
           <div className="flex flex-col items-center justify-center h-64 w-full gap-3">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
-            <p className="text-sm text-gray-500 font-medium">Loading Calendar...</p>
+            <p className="text-sm text-gray-500 font-medium">Loading Calendar (67MB)...</p>
           </div>
         }
         className="max-w-full shadow-md rounded-lg overflow-hidden border border-gray-200 touch-pan-y"
         options={{
-          cMapUrl: 'cmaps/',
+          cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/cmaps/',
           cMapPacked: true,
-          disableAutoFetch: true, // IMPORTANT: Enables range requests
-          disableStream: false,
+          disableAutoFetch: true, // Only fetch needed chunks (Range requests)
+          disableStream: false,   // Enable streaming
         }}
         onTouchStart={(e) => {
           touchStartX.current = e.changedTouches[0].screenX;
@@ -83,10 +91,8 @@ export const CalendarPDFViewer = () => {
 
           if (Math.abs(diff) > 50) { // Threshold 50px
             if (diff > 0) {
-              // Swiped Left -> Next Page
               if (pageNumber < numPages) changePage(1);
             } else {
-              // Swiped Right -> Prev Page
               if (pageNumber > 1) changePage(-1);
             }
           }
@@ -98,19 +104,22 @@ export const CalendarPDFViewer = () => {
           renderTextLayer={false}
           renderAnnotationLayer={false}
           width={containerWidth}
+          error={
+            <div className="p-4 text-xs text-red-500 text-center">
+              Page render error. Please download.
+            </div>
+          }
         />
       </Document>
 
       {!loading && numPages && (
         <div className="flex flex-col items-center gap-4 mt-6 w-full px-4">
-          {/* Pagination Controls */}
           <div className="flex items-center space-x-6 bg-gray-50 px-6 py-2 rounded-full shadow-sm border border-gray-200">
             <button
               type="button"
               disabled={pageNumber <= 1}
               onClick={previousPage}
-              className="p-2 rounded-full hover:bg-white hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:shadow-none transition-all text-gray-700"
-              aria-label="Previous page"
+              className="p-2 rounded-full hover:bg-white hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all text-gray-700"
             >
               <ChevronLeftIcon className="w-5 h-5" />
             </button>
@@ -123,14 +132,12 @@ export const CalendarPDFViewer = () => {
               type="button"
               disabled={pageNumber >= numPages}
               onClick={nextPage}
-              className="p-2 rounded-full hover:bg-white hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:shadow-none transition-all text-gray-700"
-              aria-label="Next page"
+              className="p-2 rounded-full hover:bg-white hover:shadow-sm disabled:opacity-30 disabled:cursor-not-allowed transition-all text-gray-700"
             >
               <ChevronRightIcon className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Download Button */}
           <a
             href={pdfUrl}
             download="NLR-News-Calendar-2026.pdf"
@@ -142,15 +149,21 @@ export const CalendarPDFViewer = () => {
         </div>
       )}
 
-      {!loading && !numPages && (
-        <div className="flex flex-col items-center justify-center p-8 text-center bg-red-50 rounded-lg border border-red-100 mx-4">
-          <p className="text-red-600 font-medium mb-1">Unable to load Calendar</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="text-xs text-red-500 hover:text-red-700 underline"
+      {/* Explicit Error State within Viewer (in case ErrorBoundary doesn't catch it) */}
+      {!loading && (!numPages || errorMsg) && (
+        <div className="flex flex-col items-center justify-center p-8 text-center bg-red-50 rounded-lg border border-red-100 mx-4 w-full">
+          <p className="text-red-700 font-medium mb-2">{errorMsg || "Unable to load Calendar"}</p>
+          <p className="text-xs text-red-500 mb-4 max-w-sm">
+            The file is very large (67MB) and may not load on mobile connections.
+          </p>
+          <a
+            href={pdfUrl}
+            download="NLR-News-Calendar-2026.pdf"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium text-sm"
           >
-            Try refreshing the page
-          </button>
+            <ArrowDownTrayIcon className="w-4 h-4" />
+            Download Directly
+          </a>
         </div>
       )}
     </div>
