@@ -59,7 +59,7 @@ export const LoginPage = () => {
 
   // Check for OAuth errors in URL
   useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
+    const urlParams = new window.URLSearchParams(window.location.search);
     const oauthError = urlParams.get('error');
     if (oauthError) {
       const errorMessages = {

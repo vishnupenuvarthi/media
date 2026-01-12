@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { getBackendUrl } from '@/utils/getBackendUrl';
-import { ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon, ArrowPathIcon, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -31,11 +31,9 @@ export const CalendarPDFViewerNew = () => {
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
     const [loading, setLoading] = useState(true);
-    const [errorMsg, setErrorMsg] = useState(null);
     const [loadProgress, setLoadProgress] = useState(0);
     const [containerWidth, setContainerWidth] = useState(600);
     const [key, setKey] = useState(0);
-    const [isPageLoaded, setIsPageLoaded] = useState(false);
     const [slideDirection, setSlideDirection] = useState('right'); // 'right' or 'left'
     const [scale, setScale] = useState(1); // Track scale to toggle panning
 
@@ -60,10 +58,6 @@ export const CalendarPDFViewerNew = () => {
         setLoading(false);
     }
 
-    const onPageLoadSuccess = () => {
-        setIsPageLoaded(true);
-    };
-
     const options = useMemo(() => ({
         cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/cmaps/',
         cMapPacked: true,
@@ -78,13 +72,11 @@ export const CalendarPDFViewerNew = () => {
             setSlideDirection(offset > 0 ? 'right' : 'left');
             // Small delay to reset animation class if needed, but key change handles it
             setPageNumber(newPage);
-            setIsPageLoaded(false);
         }
     };
 
     const handleRetry = () => {
         setLoading(true);
-        setErrorMsg(null);
         setLoadProgress(0);
         setKey(prev => prev + 1);
         setScale(1);
@@ -118,7 +110,6 @@ export const CalendarPDFViewerNew = () => {
                     onLoadError={(err) => {
                         console.error("PDF Load Error:", err);
                         setLoading(false);
-                        setErrorMsg(err.message);
                     }}
                     loading={
                         <div className="flex flex-col items-center gap-4 p-10">

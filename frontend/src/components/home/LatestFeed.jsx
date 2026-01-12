@@ -26,8 +26,8 @@ export const LatestFeed = ({ stories = [] }) => {
                 <span className="absolute -left-[8px] sm:-left-[10px] top-1 h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-primary ring-2 ring-white group-hover:ring-primary/50 transition" />
                 <Link to={`/article/${story.slug}`} className="flex gap-2 sm:gap-3 lg:gap-4 items-start hover:bg-gray-50 p-2 sm:p-3 rounded-lg -m-2 sm:-m-3 transition">
                   {story.heroImage && (
-                    <img 
-                      src={story.heroImage} 
+                    <img
+                      src={story.heroImage}
                       alt={story.title}
                       className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg flex-shrink-0 opacity-0 group-hover:opacity-100 transition hidden sm:block"
                     />
@@ -38,7 +38,7 @@ export const LatestFeed = ({ stories = [] }) => {
                         {dayjs(story.publishedAt).format('h:mm A · MMM D')}
                       </p>
                       <span className="text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 rounded bg-primary/10 text-primary">
-                        {translateCategory(language, story.category)}
+                        {news.map((item, _idx) => (language, story.category)}
                       </span>
                     </div>
                     <h3 className="font-serif text-base sm:text-lg lg:text-xl font-semibold group-hover:text-primary transition line-clamp-2">
