@@ -49,7 +49,17 @@ app.use(
   })
 );
 app.use(helmet());
-app.use(compression());
+app.use(compression({
+  filter: (req, res) => {
+    // CRITICAL: Disable compression for PDFs to allow Range Requests (Partial Content)
+    // This allows mobile viewers to download chunks instead of the full 67MB file
+    if (req.url.includes('/download-pdf') || req.path.endsWith('.pdf')) {
+      return false;
+    }
+    // Fallback to standard filter function
+    return compression.filter(req, res);
+  }
+}));
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
