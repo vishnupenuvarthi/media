@@ -10,7 +10,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
 
 export const CalendarPDFViewerNew = () => {
     // Debug Log
-    useEffect(() => { console.log("CalendarPDFViewerNew v100.0 HYPER Loaded"); }, []);
+    useEffect(() => { console.log("CalendarPDFViewerNew v200.0 STABLE iOS Loaded"); }, []);
 
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -162,8 +162,8 @@ export const CalendarPDFViewerNew = () => {
                         />
                     </div>
 
-                    {/* Pre-load NEXT page (Always Mounted, Hidden) - INSTANT NEXT */}
-                    {pageNumber < numPages && (
+                    {/* DESKTOP ONLY: Pre-load NEXT page (Hidden) */}
+                    {!isMobile && pageNumber < numPages && (
                         <div style={{ display: 'none' }}>
                             <Page
                                 key={`preload_next_${pageNumber + 1}`}
@@ -177,8 +177,8 @@ export const CalendarPDFViewerNew = () => {
                         </div>
                     )}
 
-                    {/* Pre-load NEXT+1 page (Aggressive Cache) */}
-                    {pageNumber + 1 < numPages && (
+                    {/* DESKTOP ONLY: Pre-load NEXT+1 page */}
+                    {!isMobile && pageNumber + 1 < numPages && (
                         <div style={{ display: 'none' }}>
                             <Page
                                 key={`preload_next2_${pageNumber + 2}`}
@@ -192,8 +192,8 @@ export const CalendarPDFViewerNew = () => {
                         </div>
                     )}
 
-                    {/* Pre-load PREVIOUS page (Always Mounted, Hidden) - INSTANT BACK */}
-                    {pageNumber > 1 && (
+                    {/* DESKTOP ONLY: Pre-load PREVIOUS page */}
+                    {!isMobile && pageNumber > 1 && (
                         <div style={{ display: 'none' }}>
                             <Page
                                 key={`preload_prev_${pageNumber - 1}`}
@@ -235,7 +235,7 @@ export const CalendarPDFViewerNew = () => {
                             >
                                 <ArrowDownTrayIcon className="w-3 h-3" /> Download PDF
                             </a>
-                            <span className="text-[10px] text-fuchsia-600 font-bold bg-fuchsia-50 px-2 py-0.5 rounded-full ring-1 ring-fuchsia-100 animate-pulse">v100.0 HYPER</span>
+                            <span className="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full ring-1 ring-blue-100">v200.0 STABLE</span>
                         </div>
                     </div>
 
