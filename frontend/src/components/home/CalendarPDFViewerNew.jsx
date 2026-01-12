@@ -5,12 +5,12 @@ import { ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon, ArrowPathIcon } f
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-// FIX: Use LOCAL worker v4.4.168 to avoid iOS Cross-Origin Worker blocks
-pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
+// FIX: Use Reliable CDN worker to match React-PDF 9.x version.
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs`;
 
 export const CalendarPDFViewerNew = () => {
     // Debug Log
-    useEffect(() => { console.log("CalendarPDFViewerNew v200.0 STABLE iOS Loaded"); }, []);
+    useEffect(() => { console.log("CalendarPDFViewerNew v700.0 iOS SAFE Loaded"); }, []);
 
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -101,25 +101,30 @@ export const CalendarPDFViewerNew = () => {
                         </div>
                     }
                     error={
-                        <div className="flex flex-col items-center gap-4 p-8 text-center px-4">
-                            <div className="p-3 bg-red-50 rounded-full">
-                                <ArrowDownTrayIcon className="w-6 h-6 text-red-500" />
+                        <div className="flex flex-col items-center gap-6 p-10 text-center px-4 max-w-sm mx-auto">
+                            <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mb-2">
+                                <ArrowDownTrayIcon className="w-8 h-8 text-red-500" />
                             </div>
                             <div>
-                                <p className="text-red-600 font-bold mb-1">Unable to load PDF</p>
-                                <p className="text-xs text-red-400 font-mono bg-red-50 p-2 rounded break-all max-w-[280px]">
-                                    {errorMsg || "Unknown connection error"}
+                                <h3 className="text-lg font-bold text-gray-900 mb-2">Viewer Limitation</h3>
+                                <p className="text-sm text-gray-500 leading-relaxed mb-4">
+                                    Your device is optimizing memory. Tap below to view the calendar directly in your native viewer.
                                 </p>
                             </div>
-                            <button
-                                onClick={handleRetry}
-                                className="px-6 py-2 bg-gray-900 text-white rounded-full text-sm font-medium flex items-center gap-2 hover:bg-gray-800 transition-colors shadow-lg shadow-gray-200"
+
+                            <a
+                                href={pdfUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="w-full py-3.5 bg-primary text-white rounded-xl text-sm font-bold shadow-lg shadow-red-100 flex items-center justify-center gap-2 hover:bg-red-700 transition-all active:scale-95"
                             >
-                                <ArrowPathIcon className="w-4 h-4" /> Retry Connection
+                                <ArrowDownTrayIcon className="w-5 h-5" />
+                                Open Calendar PDF
+                            </a>
+
+                            <button onClick={handleRetry} className="text-xs text-gray-400 font-medium hover:text-gray-600 underline">
+                                Try Reloading Viewer
                             </button>
-                            <div className="text-xs text-gray-400 mt-2">
-                                Or <a href={pdfUrl} download className="text-primary underline">download file</a> (67MB)
-                            </div>
                         </div>
                     }
                     className="touch-pan-y"
@@ -235,7 +240,7 @@ export const CalendarPDFViewerNew = () => {
                             >
                                 <ArrowDownTrayIcon className="w-3 h-3" /> Download PDF
                             </a>
-                            <span className="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full ring-1 ring-blue-100">v200.0 STABLE</span>
+                            <span className="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded-full ring-1 ring-indigo-100">v700.0 iOS SAFE</span>
                         </div>
                     </div>
 
