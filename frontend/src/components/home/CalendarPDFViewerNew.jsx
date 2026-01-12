@@ -10,7 +10,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
 
 export const CalendarPDFViewerNew = () => {
     // Debug Log
-    useEffect(() => { console.log("CalendarPDFViewerNew v7.0 iOS+Speed Loaded"); }, []);
+    useEffect(() => { console.log("CalendarPDFViewerNew v8.0 INSTANT"); }, []);
 
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -143,33 +143,50 @@ export const CalendarPDFViewerNew = () => {
                     }}
                 >
                     {/* Main Page */}
-                    <Page
-                        key={`page_${pageNumber}`}
-                        pageNumber={pageNumber}
-                        width={containerWidth}
-                        onRenderSuccess={onPageLoadSuccess}
-                        renderTextLayer={false}
-                        renderAnnotationLayer={false}
-                        cleanupAfterRender={true}
-                        pixelRatio={pixelRatio}
-                        loading={
-                            <div className="h-[500px] w-full flex flex-col items-center justify-center bg-gray-50/50">
-                                <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-400 rounded-full animate-spin mb-4"></div>
-                                <span className="text-xs text-gray-400 font-medium animate-pulse">Rendering Page {pageNumber}...</span>
-                            </div>
-                        }
-                    />
+                    <div className="transform-gpu will-change-transform">
+                        <Page
+                            key={`page_${pageNumber}`}
+                            pageNumber={pageNumber}
+                            width={containerWidth}
+                            onRenderSuccess={onPageLoadSuccess}
+                            renderTextLayer={false}
+                            renderAnnotationLayer={false}
+                            cleanupAfterRender={true}
+                            pixelRatio={pixelRatio}
+                            loading={
+                                <div className="h-[500px] w-full flex flex-col items-center justify-center bg-gray-50/50">
+                                    <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-400 rounded-full animate-spin mb-4"></div>
+                                    <span className="text-xs text-gray-400 font-medium animate-pulse">Rendering Page {pageNumber}...</span>
+                                </div>
+                            }
+                        />
+                    </div>
 
                     {/* Pre-load NEXT page (Hidden) */}
                     {isPageLoaded && pageNumber < numPages && (
                         <div style={{ display: 'none' }}>
                             <Page
-                                key={`preload_${pageNumber + 1}`}
+                                key={`preload_next_${pageNumber + 1}`}
                                 pageNumber={pageNumber + 1}
                                 width={containerWidth}
                                 renderTextLayer={false}
                                 renderAnnotationLayer={false}
-                                cleanupAfterRender={false} // Keep in memory for instant switch
+                                cleanupAfterRender={false}
+                                pixelRatio={pixelRatio}
+                            />
+                        </div>
+                    )}
+
+                    {/* Pre-load PREVIOUS page (Hidden) */}
+                    {isPageLoaded && pageNumber > 1 && (
+                        <div style={{ display: 'none' }}>
+                            <Page
+                                key={`preload_prev_${pageNumber - 1}`}
+                                pageNumber={pageNumber - 1}
+                                width={containerWidth}
+                                renderTextLayer={false}
+                                renderAnnotationLayer={false}
+                                cleanupAfterRender={false}
                                 pixelRatio={pixelRatio}
                             />
                         </div>
@@ -203,7 +220,7 @@ export const CalendarPDFViewerNew = () => {
                             >
                                 <ArrowDownTrayIcon className="w-3 h-3" /> Download PDF
                             </a>
-                            <span className="text-[10px] text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded-full ring-1 ring-green-100">v7.0 iOS FIX</span>
+                            <span className="text-[10px] text-green-600 font-bold bg-green-50 px-2 py-0.5 rounded-full ring-1 ring-green-100">v8.0 INSTANT</span>
                         </div>
                     </div>
 
