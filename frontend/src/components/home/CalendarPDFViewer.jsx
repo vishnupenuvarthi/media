@@ -52,31 +52,43 @@ export const CalendarPDFViewer = () => {
     setPageNumber(prevPageNumber => prevPageNumber + offset);
   }
 
-  // FALLBACK VIEW: If React-PDF crashes (common on mobile with 67MB files), 
-  // show this native iframe instantly.
-  if (useFallback) {
+  // MOBILE/TABLET: FORCE NATIVE VIEW IMMEDIATELY
+  // Do not attempt to load React-PDF on mobile for this 67MB file.
+  // It causes OOM (Out of Memory) crashes before the error handler can trigger.
+  if (isMobile || useFallback) {
     return (
-      <div className="flex flex-col items-center justify-center w-full bg-gray-50 rounded-xl overflow-hidden border border-gray-100 shadow-sm h-[80vh] relative">
+      <div className="flex flex-col items-center justify-center w-full bg-gray-50 rounded-xl overflow-hidden border border-gray-100 shadow-sm h-[85vh] relative">
         <div className="absolute top-4 left-0 right-0 z-10 flex justify-center pointer-events-none">
-          <span className="bg-black/50 text-white text-xs px-3 py-1 rounded-full backdrop-blur-md">
-            Mobile Viewer (Native)
+          <span className="bg-black/60 text-white text-[10px] uppercase tracking-wider font-bold px-3 py-1 rounded-full backdrop-blur-md shadow-sm">
+            Native PDF Viewer
           </span>
         </div>
-        <iframe
-          src={pdfUrl}
-          className="w-full h-full border-0"
-          title="Native PDF Viewer"
-        />
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center z-10 pointer-events-auto">
-          <a
-            href={pdfUrl}
-            download="NLR-News-Calendar-2026.pdf"
-            className="px-4 py-2 bg-white/90 text-primary hover:bg-white rounded-full shadow-lg text-sm font-semibold flex items-center gap-2 backdrop-blur-sm transition-all active:scale-95"
-          >
-            <ArrowDownTrayIcon className="w-4 h-4" />
-            Download if not visible
-          </a>
-        </div>
+
+        {/* Object tag is the most robust way to trigger native PDF handling */}
+        <object
+          data={pdfUrl}
+          type="application/pdf"
+          className="w-full h-full"
+        >
+          {/* Fallback for browsers (old Android) that cannot embed PDF */}
+          <div className="flex flex-col items-center justify-center h-full p-6 text-center">
+            <div className="bg-white p-4 rounded-full shadow-sm mb-4">
+              <DocumentTextIcon className="w-10 h-10 text-primary" />
+            </div>
+            <p className="text-gray-900 font-semibold mb-2">Device limit reached</p>
+            <p className="text-gray-500 text-sm mb-6 max-w-xs mx-auto">
+              This calendar file (67MB) is too large to display inside your current browser.
+            </p>
+            <a
+              href={pdfUrl}
+              download="NLR-News-Calendar-2026.pdf"
+              className="px-6 py-3 bg-primary text-white hover:bg-primary/90 rounded-lg shadow-lg text-sm font-semibold flex items-center gap-2 transition-all active:scale-95"
+            >
+              <ArrowDownTrayIcon className="w-5 h-5" />
+              Download PDF
+            </a>
+          </div>
+        </object>
       </div>
     );
   }
