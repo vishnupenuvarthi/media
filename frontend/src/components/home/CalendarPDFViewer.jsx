@@ -23,7 +23,7 @@ export const CalendarPDFViewer = () => {
   const pdfUrl = `${getBackendUrl()}/api/calendar/download-pdf`;
 
   useEffect(() => {
-    const checkMobile = () => {
+    const updateWidth = () => {
       const width = window.innerWidth;
       setIsMobile(width < 1024);
 
@@ -35,13 +35,14 @@ export const CalendarPDFViewer = () => {
         // Cap width to improve render speed on large screens
         // On mobile, subtract padding
         setContainerWidth(Math.min(width - 32, 800));
-      };
+      }
+    };
 
-      updateWidth();
-      // Debounce resize slightly in real apps, but here direct is fine
-      window.addEventListener('resize', updateWidth);
-      return () => window.removeEventListener('resize', updateWidth);
-    }, []);
+    updateWidth();
+    // Debounce resize slightly in real apps, but here direct is fine
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
 
   function onDocumentLoadSuccess({ numPages }) {
     setNumPages(numPages);
