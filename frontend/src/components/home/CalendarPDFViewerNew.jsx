@@ -151,7 +151,7 @@ export const CalendarPDFViewerNew = () => {
                             >
                                 <ArrowDownTrayIcon className="w-3 h-3" /> Download
                             </a>
-                            <span className="text-[10px] text-green-600 font-bold bg-green-50 px-1 rounded">v4.0 NEW</span>
+                            <span className="text-[10px] text-purple-600 font-bold bg-purple-50 px-1 rounded">v5.0 CDN</span>
                         </div>
                     </div>
 
