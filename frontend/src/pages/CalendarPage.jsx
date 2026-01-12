@@ -1,4 +1,4 @@
-import { CalendarPDFViewer } from '@/components/home/CalendarPDFViewer';
+import { CalendarPDFViewerNew } from '@/components/home/CalendarPDFViewerNew';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { getBackendUrl } from '@/utils/getBackendUrl';
 import { ArrowDownTrayIcon } from '@heroicons/react/24/outline';
