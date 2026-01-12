@@ -8,7 +8,7 @@ import { translate } from '@/utils/translator';
 const primaryNavKeys = [
   { key: 'nlrCalendar', path: '/calendar' },
   { key: 'youtube', path: '/youtube' },
-  { key: 'latest', path: '/' },
+  { key: 'latest', path: '/news' },
   { key: 'breaking', path: '/breaking', label: 'Breaking News' },
   { key: 'india', path: '/category/india' },
   { key: 'world', path: '/category/world' },
@@ -117,8 +117,8 @@ export const Header = () => {
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="hidden lg:flex flex-col text-right text-xs text-gray-500">
-              <span>{t('header.temperatureLabel')}</span>
-              <span className="text-sm text-primary font-semibold">28°C | AQI 86</span>
+              <span className="uppercase tracking-wider font-bold text-gray-400">Nellore</span>
+              <span className="text-sm text-primary font-semibold">32°C | AQI 42</span>
             </div>
             <div className="relative hidden sm:block">
               <input

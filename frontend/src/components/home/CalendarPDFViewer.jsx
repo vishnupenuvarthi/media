@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { getBackendUrl } from '@/utils/getBackendUrl';
 import { ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
@@ -13,6 +13,7 @@ export const CalendarPDFViewer = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [loading, setLoading] = useState(true);
   const [containerWidth, setContainerWidth] = useState(800);
+  const touchStartX = useRef(null);
 
   const pdfUrl = `${getBackendUrl()}/api/calendar/download-pdf`;
 
@@ -65,12 +66,31 @@ export const CalendarPDFViewer = () => {
             <p className="text-sm text-gray-500 font-medium">Loading Calendar...</p>
           </div>
         }
-        className="max-w-full shadow-md rounded-lg overflow-hidden border border-gray-200"
+        className="max-w-full shadow-md rounded-lg overflow-hidden border border-gray-200 touch-pan-y"
         options={{
           cMapUrl: 'cmaps/',
           cMapPacked: true,
           disableAutoFetch: true, // IMPORTANT: Enables range requests
           disableStream: false,
+        }}
+        onTouchStart={(e) => {
+          touchStartX.current = e.changedTouches[0].screenX;
+        }}
+        onTouchEnd={(e) => {
+          if (!touchStartX.current) return;
+          const touchEndX = e.changedTouches[0].screenX;
+          const diff = touchStartX.current - touchEndX;
+
+          if (Math.abs(diff) > 50) { // Threshold 50px
+            if (diff > 0) {
+              // Swiped Left -> Next Page
+              if (pageNumber < numPages) changePage(1);
+            } else {
+              // Swiped Right -> Prev Page
+              if (pageNumber > 1) changePage(-1);
+            }
+          }
+          touchStartX.current = null;
         }}
       >
         <Page

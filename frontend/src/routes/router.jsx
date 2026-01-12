@@ -21,6 +21,10 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
+        element: <CalendarPage /> // Default route now shows Calendar
+      },
+      {
+        path: 'news', // Moved news feed here
         element: <HomePage />
       },
       {
