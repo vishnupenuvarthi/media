@@ -102,3 +102,4 @@ Open browser console on your frontend URL and check for API errors.
 
 **Once all items are checked, your app is live! 🎉**
 
+

@@ -49,3 +49,4 @@ The `npm start` command will run `node src/server.js` as defined in `package.jso
 3. Check the logs - you should see: `🚀 Server running on port 10000`
 4. Test: `https://your-service.onrender.com/api/health`
 
+

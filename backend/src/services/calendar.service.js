@@ -15,12 +15,19 @@ const buildDateRange = ({ year, month }) => {
 export const CalendarService = {
   listEvents: async ({ year, month }) => {
     try {
-      const range = buildDateRange({ year, month });
-      if (!range) {
-        throw new Error('Invalid year provided');
+      let filter = {};
+      
+      // If year is provided, filter by date range
+      if (year) {
+        const range = buildDateRange({ year, month });
+        if (!range) {
+          throw new Error('Invalid year provided');
+        }
+        filter = { date: { $gte: range.start, $lt: range.end } };
       }
-      const filter = { date: { $gte: range.start, $lt: range.end } };
-      const events = await CalendarEventModel.find(filter).sort({ date: 1 }).lean();
+      // If no year provided, return all events (useful for PDFs)
+      
+      const events = await CalendarEventModel.find(filter).sort({ date: -1 }).lean();
       return events;
     } catch (error) {
       console.error('Error in CalendarService.listEvents:', error.message);

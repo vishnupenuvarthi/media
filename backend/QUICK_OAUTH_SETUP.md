@@ -90,3 +90,4 @@ APPLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYOUR_KEY\n-----END PRIVATE KEY--
 - Backend CORS is configured to allow OAuth redirects
 - If issues persist, check `FRONTEND_URL` in backend `.env`
 
+

@@ -49,6 +49,10 @@ const RSS_SOURCES = {
     // Priority: Nellore & Andhra Pradesh (Telugu)
     'https://news.google.com/rss/search?q=Nellore+news+telugu&hl=te&gl=IN&ceid=IN:te',
     'https://news.google.com/rss/search?q=Andhra+Pradesh+news+telugu&hl=te&gl=IN&ceid=IN:te',
+    'https://news.google.com/rss/search?q=Telangana+news+telugu&hl=te&gl=IN&ceid=IN:te',
+    // Localized categories
+    'https://news.google.com/rss/search?q=Andhra+Pradesh+Politics+telugu&hl=te&gl=IN&ceid=IN:te',
+    'https://news.google.com/rss/search?q=Tollywood+news+telugu&hl=te&gl=IN&ceid=IN:te',
     // General
     'https://news.google.com/rss/search?q=India&hl=te&gl=IN&ceid=IN:te',
   ]
@@ -226,7 +230,9 @@ const extractImage = async (link) => {
         'placehold.it',
         'dummyimage.com',
         'fakeimg.pl',
-        'google.com/images/branding/googlelogo' // Explicitly block google logo
+        'fakeimg.pl',
+        'google.com/images/branding/googlelogo', // Explicitly block google logo
+        'gstatic.com' // Block gstatic generic icons
       ];
 
       const isPlaceholder = placeholderServices.some(service => image.includes(service));
@@ -235,10 +241,12 @@ const extractImage = async (link) => {
       }
 
       // Explicitly reject known "Google News" generic thumbnails if they slip through
-      if (image.includes('googleusercontent') && (image.includes('s100') || image.includes('sz=50'))) {
-        // Small thumbnails are often generic icons
-        // return null; 
-        // Actually, let's keep them ONLY if they are large enough, but usually google news thumbnails are small.
+      if (image.includes('googleusercontent.com') || image.includes('gstatic.com')) {
+        // Block small letter avatars or generic publisher logos often hosted here
+        // s100, s32 = small size.
+        if (image.includes('=s') && (image.includes('=s32') || image.includes('=s64') || image.includes('=s100'))) {
+          return null;
+        }
       }
 
       return image;

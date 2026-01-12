@@ -158,3 +158,4 @@ For better security in production:
 2. However, Render uses dynamic IPs, so `0.0.0.0/0` is the most practical solution
 3. MongoDB Atlas has built-in authentication, so IP whitelist is just an extra layer
 
+

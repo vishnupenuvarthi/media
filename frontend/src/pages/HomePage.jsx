@@ -2,6 +2,7 @@ import { useHomeFeed } from '@/hooks/useHomeFeed';
 import { HeroSection } from '@/components/home/HeroSection';
 import { SectionStack } from '@/components/home/SectionStack';
 import { TrendingSidebar } from '@/components/home/TrendingSidebar';
+import { CategoriesSidebar } from '@/components/home/CategoriesSidebar';
 import { LatestFeed } from '@/components/home/LatestFeed';
 import { VideoRail } from '@/components/home/VideoRail';
 import { PhotoCarousel } from '@/components/home/PhotoCarousel';
@@ -67,7 +68,10 @@ export const HomePage = () => {
       <HeroSection stories={data.hero || []} />
       <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 grid lg:grid-cols-[2fr_0.8fr] gap-4 sm:gap-6 lg:gap-8">
         <SectionStack sections={data.sections || data.categorySections || []} />
-        <TrendingSidebar stories={data.trending || []} />
+        <div className="space-y-4 sm:space-y-6">
+          <CategoriesSidebar />
+          <TrendingSidebar stories={data.trending || []} />
+        </div>
       </div>
       <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 space-y-6 sm:space-y-8 lg:space-y-10">
         <SectionStack sections={data.categorySections || []} />
@@ -80,4 +84,3 @@ export const HomePage = () => {
     </div>
   );
 };
-
