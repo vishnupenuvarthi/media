@@ -36,7 +36,7 @@ export const CalendarPage = () => {
               </a>
             </div>
           }>
-            <CalendarPDFViewer />
+            <CalendarPDFViewerNew />
           </ErrorBoundary>
         </div>
       </div>
