@@ -6,9 +6,9 @@ import { ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon, ArrowPathIcon } f
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-// CRITICAL FIX: Match worker version to React-PDF 9.x requirements (pdfjs-dist@4.8.69)
-// Mismatch caused "PDF viewer encountered error"
-pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@4.8.69/build/pdf.worker.min.mjs`;
+// CRITICAL FIX: Use LOCAL worker (v4.8.69) to avoid CORS issues.
+// CDN workers often get blocked for Range Requests on large files.
+pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
 
 export const CalendarPDFViewer = () => {
   const [numPages, setNumPages] = useState(null);
@@ -160,7 +160,7 @@ export const CalendarPDFViewer = () => {
               >
                 <ArrowDownTrayIcon className="w-3 h-3" /> Download
               </a>
-              <span className="text-[10px] text-blue-600 font-bold bg-blue-50 px-1 rounded">v3.0 FIXED</span>
+              <span className="text-[10px] text-green-600 font-bold bg-green-50 px-1 rounded">v3.1 LIVE</span>
             </div>
           </div>
 
