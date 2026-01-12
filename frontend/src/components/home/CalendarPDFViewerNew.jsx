@@ -12,7 +12,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 export const CalendarPDFViewerNew = () => {
     // Debug Log
-    useEffect(() => { console.log("CalendarPDFViewerNew v1400.0 PRO DOCK Loaded"); }, []);
+    useEffect(() => { console.log("CalendarPDFViewerNew v1500.0 REFINED Loaded"); }, []);
 
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -204,7 +204,7 @@ export const CalendarPDFViewerNew = () => {
                                                     {pageNumber} / {numPages}
                                                 </span>
                                                 <span className="text-[9px] text-fuchsia-400 font-bold uppercase tracking-wider">
-                                                    v1400.0 PRO
+                                                    v1500.0 REFINED
                                                 </span>
                                             </div>
 
@@ -230,23 +230,23 @@ export const CalendarPDFViewerNew = () => {
                 </Document>
             </div>
 
-            {/* Side Navigation Arrows (Ghost Mode) - Vertically Centered */}
+            {/* Side Navigation Arrows (Ghost Mode) - Vertically Centered, Smaller & More Transparent */}
             {!loading && numPages && (
                 <>
                     <button
                         onClick={() => changePage(-1)}
                         disabled={pageNumber <= 1}
-                        className="absolute top-1/2 left-4 -translate-y-1/2 z-30 p-3 bg-black/20 hover:bg-black/50 backdrop-blur-sm rounded-full text-white transition-all disabled:opacity-0 active:scale-90"
+                        className="absolute top-1/2 left-2 -translate-y-1/2 z-30 p-2 bg-black/10 hover:bg-black/40 backdrop-blur-[2px] rounded-full text-white/70 hover:text-white transition-all disabled:opacity-0 active:scale-90 opacity-40 hover:opacity-100"
                     >
-                        <ChevronLeftIcon className="w-8 h-8" />
+                        <ChevronLeftIcon className="w-6 h-6" />
                     </button>
 
                     <button
                         onClick={() => changePage(1)}
                         disabled={pageNumber >= numPages}
-                        className="absolute top-1/2 right-4 -translate-y-1/2 z-30 p-3 bg-black/20 hover:bg-black/50 backdrop-blur-sm rounded-full text-white transition-all disabled:opacity-0 active:scale-90"
+                        className="absolute top-1/2 right-2 -translate-y-1/2 z-30 p-2 bg-black/10 hover:bg-black/40 backdrop-blur-[2px] rounded-full text-white/70 hover:text-white transition-all disabled:opacity-0 active:scale-90 opacity-40 hover:opacity-100"
                     >
-                        <ChevronRightIcon className="w-8 h-8" />
+                        <ChevronRightIcon className="w-6 h-6" />
                     </button>
                 </>
             )}
