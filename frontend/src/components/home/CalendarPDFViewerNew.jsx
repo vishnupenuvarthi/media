@@ -12,7 +12,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 export const CalendarPDFViewerNew = () => {
     // Debug Log
-    useEffect(() => { console.log("CalendarPDFViewerNew v1200.0 GHOST UI Loaded"); }, []);
+    useEffect(() => { console.log("CalendarPDFViewerNew v1300.0 SIDE NAV Loaded"); }, []);
 
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -211,33 +211,40 @@ export const CalendarPDFViewerNew = () => {
                 </a>
             )}
 
-            {/* Modern Floating Navigation Pill (Ghost Mode) */}
+            {/* Side Navigation Arrows (Ghost Mode) */}
             {!loading && numPages && (
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 bg-white/40 backdrop-blur-md border border-white/20 shadow-lg hover:shadow-2xl rounded-full px-2 py-2 pr-6 transition-all duration-300 hover:bg-white/90 group">
+                <>
+                    {/* Left / Previous */}
                     <button
                         onClick={() => changePage(-1)}
                         disabled={pageNumber <= 1}
-                        className="w-10 h-10 flex items-center justify-center bg-white/50 hover:bg-gray-200 rounded-full text-gray-800 disabled:opacity-30 active:scale-90 transition-all shadow-sm"
+                        className="absolute top-1/2 left-4 -translate-y-1/2 z-30 p-4 bg-black/20 hover:bg-black/50 backdrop-blur-sm rounded-full text-white transition-all disabled:opacity-0 active:scale-90"
                     >
-                        <ChevronLeftIcon className="w-5 h-5" />
+                        <ChevronLeftIcon className="w-8 h-8" />
                     </button>
 
-                    <div className="flex flex-col items-center min-w-[80px] opacity-80 group-hover:opacity-100 transition-opacity">
-                        <span className="font-bold text-gray-900 text-sm drop-shadow-sm">
-                            {pageNumber} <span className="text-gray-600 font-normal">/ {numPages}</span>
-                        </span>
-                        <span className="text-[9px] text-fuchsia-600 font-bold uppercase tracking-wider">
-                            v1200.0 GHOST
-                        </span>
-                    </div>
-
+                    {/* Right / Next */}
                     <button
                         onClick={() => changePage(1)}
                         disabled={pageNumber >= numPages}
-                        className="w-10 h-10 flex items-center justify-center bg-black/80 text-white hover:bg-black rounded-full shadow-lg disabled:opacity-30 disabled:shadow-none active:scale-90 transition-all"
+                        className="absolute top-1/2 right-4 -translate-y-1/2 z-30 p-4 bg-black/20 hover:bg-black/50 backdrop-blur-sm rounded-full text-white transition-all disabled:opacity-0 active:scale-90"
                     >
-                        <ChevronRightIcon className="w-5 h-5" />
+                        <ChevronRightIcon className="w-8 h-8" />
                     </button>
+                </>
+            )}
+
+            {/* Bottom Page Indicator */}
+            {!loading && numPages && (
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
+                    <div className="bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 shadow-lg">
+                        <span className="font-bold text-white text-sm drop-shadow-md font-mono tracking-widest">
+                            {pageNumber} / {numPages}
+                        </span>
+                    </div>
+                    <span className="text-[9px] text-white/80 font-bold uppercase tracking-wider drop-shadow-md">
+                        v1300.0 SIDE
+                    </span>
                 </div>
             )}
         </div>
