@@ -61,14 +61,25 @@ export const CalendarPDFViewer = () => {
         <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
           The calendar file is large (67MB). For the best experience on mobile, please download it directly.
         </p>
-        <a
-          href={pdfUrl}
-          download="NLR-News-Calendar-2026.pdf"
-          className="flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all shadow-md active:scale-95 font-semibold w-full justify-center sm:w-auto"
-        >
-          <ArrowDownTrayIcon className="w-5 h-5" />
-          Download PDF
-        </a>
+        <div className="flex flex-col gap-3 w-full sm:w-auto">
+          <a
+            href={pdfUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-primary border-2 border-primary/20 rounded-lg hover:bg-primary/5 transition-all font-semibold active:scale-95"
+          >
+            <DocumentTextIcon className="w-5 h-5" />
+            Open in Browser
+          </a>
+          <a
+            href={pdfUrl}
+            download="NLR-News-Calendar-2026.pdf"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all shadow-md active:scale-95 font-semibold"
+          >
+            <ArrowDownTrayIcon className="w-5 h-5" />
+            Download PDF
+          </a>
+        </div>
       </div>
     );
   }
