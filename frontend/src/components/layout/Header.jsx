@@ -48,23 +48,30 @@ export const Header = () => {
   return (
     <header className="sticky top-0 z-50 shadow-sm shadow-black/5 bg-white">
       {/* Top Bar - Responsive */}
-      <div className="bg-secondary text-xs text-gray-300">
-        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between px-3 sm:px-4 py-2 gap-2">
-          <p className="text-[10px] sm:text-xs truncate">{now}</p>
-          <div className="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-[11px] uppercase tracking-[0.2em] sm:tracking-[0.3em]">
-            <div className="flex items-center gap-1">
+      {/* Top Bar - Responsive: Adjusted for better mobile spacing */}
+      <div className="bg-secondary text-xs text-gray-300 relative z-50">
+        <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between px-3 py-2 gap-y-2">
+          {/* Date - Hidden on very small screens to save space if needed */}
+          <p className="text-[10px] sm:text-xs truncate hidden xs:block">{now}</p>
+
+          <div className="flex items-center gap-4 text-[10px] sm:text-[11px] uppercase tracking-[0.1em] sm:tracking-[0.2em] w-full sm:w-auto justify-end">
+            {/* Language Selector - Made larger for touch targets */}
+            <div className="flex items-center gap-2 bg-white/10 rounded-full px-1 py-0.5">
               {languageOptions.map((option) => (
                 <button
                   key={option.code}
                   type="button"
                   onClick={() => setLanguage(option.code)}
-                  className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[9px] sm:text-[10px] tracking-normal ${language === option.code ? 'bg-white text-secondary font-semibold' : 'hover:text-white transition'
+                  className={`px-3 py-1 rounded-full text-[10px] sm:text-xs transition-colors ${language === option.code
+                      ? 'bg-white text-secondary font-bold shadow-sm'
+                      : 'text-gray-300 hover:text-white'
                     }`}
                 >
                   {option.label}
                 </button>
               ))}
             </div>
+
             <div className="hidden sm:flex items-center gap-2 sm:gap-4">
               <button type="button" className="hover:text-white transition whitespace-nowrap">
                 {t('header.ePaper')}

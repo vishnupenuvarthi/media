@@ -100,7 +100,7 @@ export const CalendarPDFViewerNew = () => {
                         const touchEndX = e.changedTouches[0].screenX;
                         const diff = touchStartX.current - touchEndX;
 
-                        if (Math.abs(diff) > 50) {
+                        if (Math.abs(diff) > 30) { // FAST SWIPE: Reduced threshold to 30px
                             if (diff > 0) {
                                 if (pageNumber < numPages) changePage(1);
                             } else {
@@ -116,17 +116,19 @@ export const CalendarPDFViewerNew = () => {
                         renderTextLayer={false}
                         renderAnnotationLayer={false}
                         cleanupAfterRender={true}
-                        pixelRatio={Math.min(window.devicePixelRatio, 1.5)}
+                        // SPEED OPTIMIZATION: Use ratio 1.0 for mobile to ensure <1s render time
+                        pixelRatio={Math.min(window.devicePixelRatio, 1.0)}
                         loading={
                             <div className="h-[400px] w-full flex items-center justify-center bg-gray-50">
-                                <div className="animate-pulse w-3/4 h-3/4 bg-gray-200 rounded-lg"></div>
+                                <div className="animate-pulse w-full h-full bg-gray-100/50"></div>
                             </div>
                         }
                     />
                 </Document>
 
-                <div className="absolute top-0 bottom-0 left-0 w-16 z-10" onClick={() => changePage(-1)} />
-                <div className="absolute top-0 bottom-0 right-0 w-16 z-10" onClick={() => changePage(1)} />
+                {/* VISUAL HINT: Tap zones for left/right */}
+                <div className="absolute top-0 bottom-0 left-0 w-12 z-10 opacity-0 active:opacity-10 bg-black/10 transition-opacity" onClick={() => changePage(-1)} />
+                <div className="absolute top-0 bottom-0 right-0 w-12 z-10 opacity-0 active:opacity-10 bg-black/10 transition-opacity" onClick={() => changePage(1)} />
             </div>
 
             {!loading && numPages && (
@@ -136,7 +138,7 @@ export const CalendarPDFViewerNew = () => {
                         disabled={pageNumber <= 1}
                         className="p-3 bg-white border border-gray-200 rounded-full shadow-sm disabled:opacity-30 active:scale-95 transition-all"
                     >
-                        <ChevronLeftIcon className="w-5 h-5 text-gray-700" />
+                        <ChevronLeftIcon className="w-6 h-6 text-gray-700" />
                     </button>
 
                     <div className="flex flex-col items-center">
@@ -151,7 +153,7 @@ export const CalendarPDFViewerNew = () => {
                             >
                                 <ArrowDownTrayIcon className="w-3 h-3" /> Download
                             </a>
-                            <span className="text-[10px] text-purple-600 font-bold bg-purple-50 px-1 rounded">v5.0 CDN</span>
+                            <span className="text-[10px] text-gray-600 font-bold bg-gray-100 px-1 rounded">v6.0 FINAL</span>
                         </div>
                     </div>
 
@@ -160,7 +162,7 @@ export const CalendarPDFViewerNew = () => {
                         disabled={pageNumber >= numPages}
                         className="p-3 bg-white border border-gray-200 rounded-full shadow-sm disabled:opacity-30 active:scale-95 transition-all"
                     >
-                        <ChevronRightIcon className="w-5 h-5 text-gray-700" />
+                        <ChevronRightIcon className="w-6 h-6 text-gray-700" />
                     </button>
                 </div>
             )}
