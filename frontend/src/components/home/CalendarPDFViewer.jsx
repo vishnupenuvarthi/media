@@ -11,6 +11,9 @@ import 'react-pdf/dist/esm/Page/TextLayer.css';
 pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
 
 export const CalendarPDFViewer = () => {
+  // Debug Log to confirm version loaded
+  useEffect(() => { console.log("CalendarPDFViewer v3.2 Loaded"); }, []);
+
   const [numPages, setNumPages] = useState(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -160,7 +163,7 @@ export const CalendarPDFViewer = () => {
               >
                 <ArrowDownTrayIcon className="w-3 h-3" /> Download
               </a>
-              <span className="text-[10px] text-green-600 font-bold bg-green-50 px-1 rounded">v3.1 LIVE</span>
+              <span className="text-[10px] text-green-600 font-bold bg-green-50 px-1 rounded">v3.2 LIVE</span>
             </div>
           </div>
 
