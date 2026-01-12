@@ -105,6 +105,23 @@ export const CalendarPDFViewer = () => {
           }
           className="touch-pan-y"
           options={options}
+          onTouchStart={(e) => {
+            touchStartX.current = e.changedTouches[0].screenX;
+          }}
+          onTouchEnd={(e) => {
+            if (!touchStartX.current) return;
+            const touchEndX = e.changedTouches[0].screenX;
+            const diff = touchStartX.current - touchEndX;
+
+            if (Math.abs(diff) > 50) {
+              if (diff > 0) {
+                if (pageNumber < numPages) changePage(1);
+              } else {
+                if (pageNumber > 1) changePage(-1);
+              }
+            }
+            touchStartX.current = null;
+          }}
         >
           <Page
             pageNumber={pageNumber}
@@ -160,7 +177,7 @@ export const CalendarPDFViewer = () => {
               >
                 <ArrowDownTrayIcon className="w-3 h-3" /> Download
               </a>
-              <span className="text-[10px] text-gray-300">v2.1</span> {/* Version Label */}
+              <span className="text-[10px] text-green-600 font-bold bg-green-50 px-1 rounded">v2.2 LIVE</span>
             </div>
           </div>
 
