@@ -10,9 +10,23 @@ pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
 
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
+// Slide Animation Styles
+const slideStyles = `
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+.animate-slide-right { animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.animate-slide-left { animation: slideInLeft 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+`;
+
 export const CalendarPDFViewerNew = () => {
     // Debug Log
-    useEffect(() => { console.log("CalendarPDFViewerNew v1300.0 STABLE RESTORE Loaded"); }, []);
+    useEffect(() => { console.log("CalendarPDFViewerNew v1400.0 SLIDE UI Loaded"); }, []);
 
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -22,6 +36,7 @@ export const CalendarPDFViewerNew = () => {
     const [containerWidth, setContainerWidth] = useState(600);
     const [key, setKey] = useState(0);
     const [isPageLoaded, setIsPageLoaded] = useState(false);
+    const [slideDirection, setSlideDirection] = useState('right'); // 'right' or 'left'
 
     // Swipe Refs
     const touchStartX = useRef(null);
@@ -59,6 +74,8 @@ export const CalendarPDFViewerNew = () => {
     const changePage = (offset) => {
         const newPage = Math.min(Math.max(1, pageNumber + offset), numPages || 1);
         if (newPage !== pageNumber) {
+            setSlideDirection(offset > 0 ? 'right' : 'left');
+            // Small delay to reset animation class if needed, but key change handles it
             setPageNumber(newPage);
             setIsPageLoaded(false);
         }
@@ -77,9 +94,11 @@ export const CalendarPDFViewerNew = () => {
 
     return (
         <div
-            className="flex flex-col items-center w-full min-h-[500px] bg-gray-50/50 rounded-xl border border-gray-100 relative pb-20 select-none"
-            onContextMenu={(e) => e.preventDefault()} // Prevent iOS Long Press Menu
+            className="flex flex-col items-center w-full min-h-[500px] bg-gray-50/50 rounded-xl border border-gray-100 relative pb-4 select-none overflow-hidden"
+            onContextMenu={(e) => e.preventDefault()}
         >
+            <style>{slideStyles}</style>
+
             {/* Viewer Area */}
             <div className="w-full bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden min-h-[500px] flex items-center justify-center relative touch-manipulation">
                 <Document
@@ -148,7 +167,6 @@ export const CalendarPDFViewerNew = () => {
                         {({ zoomIn, zoomOut, resetTransform, state }) => (
                             <div
                                 onTouchStart={(e) => {
-                                    // Only swipe if at scale 1
                                     if (state.scale === 1) {
                                         touchStartX.current = e.changedTouches[0].screenX;
                                     }
@@ -159,12 +177,13 @@ export const CalendarPDFViewerNew = () => {
                                         const diff = touchStartX.current - touchEndX;
                                         if (Math.abs(diff) > 50) {
                                             if (diff > 0 && pageNumber < numPages) changePage(1);
-                                            // Ensure we check limit before going back
                                             if (diff < 0 && pageNumber > 1) changePage(-1);
                                         }
                                         touchStartX.current = null;
                                     }
                                 }}
+                                className={`w-full h-full flex justify-center ${slideDirection === 'right' ? 'animate-slide-right' : 'animate-slide-left'}`}
+                                key={pageNumber} // Force re-render for animation
                             >
                                 <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full flex justify-center">
                                     <Page
@@ -176,16 +195,10 @@ export const CalendarPDFViewerNew = () => {
                                         renderAnnotationLayer={false}
                                         cleanupAfterRender={true}
                                         pixelRatio={pixelRatio}
-                                        loading={
-                                            <div className="h-[500px] w-full flex flex-col items-center justify-center bg-gray-50/50">
-                                                <div className="w-12 h-12 border-4 border-gray-200 border-t-gray-400 rounded-full animate-spin mb-4"></div>
-                                                <span className="text-xs text-gray-400 font-medium animate-pulse">Rendering Page {pageNumber}...</span>
-                                            </div>
-                                        }
                                     />
                                 </TransformComponent>
 
-                                {/* Floating Zoom Controls (Transparent until interaction) */}
+                                {/* Floating Zoom Controls */}
                                 <div className="absolute top-20 right-4 flex flex-col gap-2 z-20 opacity-60 hover:opacity-100 transition-opacity">
                                     <button onClick={() => zoomIn()} className="p-2 bg-black/20 backdrop-blur-md border border-white/10 text-white rounded-full shadow-sm hover:bg-black/60 transition-colors">
                                         <MagnifyingGlassPlusIcon className="w-5 h-5" />
@@ -201,48 +214,54 @@ export const CalendarPDFViewerNew = () => {
                         )}
                     </TransformWrapper>
                 </Document>
+
+                {/* SIDE NAVIGATION (Carousel Style) */}
+                {!loading && numPages && (
+                    <>
+                        {/* LEFT NAV */}
+                        <button
+                            onClick={() => changePage(-1)}
+                            disabled={pageNumber <= 1}
+                            className={`absolute left-2 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full transition-all duration-300 ${pageNumber <= 1 ? 'opacity-0 pointer-events-none' : 'bg-white/40 backdrop-blur-md hover:bg-white/80 shadow-lg text-gray-800'}`}
+                        >
+                            <ChevronLeftIcon className="w-6 h-6" />
+                        </button>
+
+                        {/* RIGHT NAV */}
+                        <button
+                            onClick={() => changePage(1)}
+                            disabled={pageNumber >= numPages}
+                            className={`absolute right-2 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full transition-all duration-300 ${pageNumber >= numPages ? 'opacity-0 pointer-events-none' : 'bg-white/40 backdrop-blur-md hover:bg-white/80 shadow-lg text-gray-800'}`}
+                        >
+                            <ChevronRightIcon className="w-6 h-6" />
+                        </button>
+                    </>
+                )}
             </div>
 
-            {/* Top Right Download Button (Transparent) */}
-            {!loading && (
-                <a
-                    href={pdfUrl}
-                    download="NLR-News-Calendar-2026.pdf"
-                    className="absolute top-4 right-4 z-40 p-3 bg-white/30 backdrop-blur-md border border-white/20 rounded-full shadow-sm text-gray-700 hover:bg-white/90 hover:text-primary active:scale-95 transition-all opacity-70 hover:opacity-100"
-                >
-                    <ArrowDownTrayIcon className="w-5 h-5" />
-                </a>
-            )}
-
-            {/* Modern Floating Navigation Pill (Transparent) */}
+            {/* Bottom Info & Download (Minimal) */}
             {!loading && numPages && (
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 bg-white/60 backdrop-blur-sm border border-white/20 shadow-lg rounded-full px-2 py-2 pr-6 hover:bg-white/90 hover:shadow-2xl transition-all duration-300 group">
-                    <button
-                        onClick={() => changePage(-1)}
-                        disabled={pageNumber <= 1}
-                        className="w-10 h-10 flex items-center justify-center bg-white/50 hover:bg-white rounded-full text-gray-700 disabled:opacity-30 active:scale-90 transition-all shadow-sm"
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 bg-black/50 backdrop-blur-md text-white rounded-full px-4 py-1.5 shadow-lg border border-white/10">
+                    <span className="font-medium text-xs tracking-wide">
+                        {pageNumber} / {numPages}
+                    </span>
+                    <div className="w-px h-3 bg-white/30"></div>
+                    <a
+                        href={pdfUrl}
+                        download="NLR-News-Calendar-2026.pdf"
+                        className="flex items-center gap-1.5 hover:text-primary transition-colors"
                     >
-                        <ChevronLeftIcon className="w-5 h-5" />
-                    </button>
-
-                    <div className="flex flex-col items-center min-w-[80px]">
-                        <span className="font-bold text-gray-900 text-sm drop-shadow-sm">
-                            {pageNumber} <span className="text-gray-600 font-normal">/ {numPages}</span>
-                        </span>
-                        <span className="text-[9px] text-fuchsia-600 font-bold uppercase tracking-wider opacity-60 group-hover:opacity-100 transition-opacity">
-                            v1300.0 STABLE RESTORE
-                        </span>
-                    </div>
-
-                    <button
-                        onClick={() => changePage(1)}
-                        disabled={pageNumber >= numPages}
-                        className="w-10 h-10 flex items-center justify-center bg-black/80 text-white hover:bg-black rounded-full shadow-lg disabled:opacity-30 disabled:shadow-none active:scale-90 transition-all"
-                    >
-                        <ChevronRightIcon className="w-5 h-5" />
-                    </button>
+                        <ArrowDownTrayIcon className="w-3.5 h-3.5" />
+                        <span className="text-[10px] uppercase font-bold tracking-wider">Download</span>
+                    </a>
                 </div>
             )}
+
+            <div className="absolute top-2 left-4 z-20">
+                <span className="text-[9px] text-fuchsia-600 font-bold uppercase tracking-wider bg-white/80 backdrop-blur px-2 py-0.5 rounded-md shadow-sm">
+                    v1400.0 SLIDE UI
+                </span>
+            </div>
         </div>
     );
 };
