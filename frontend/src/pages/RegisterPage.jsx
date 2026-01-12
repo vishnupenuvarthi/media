@@ -25,8 +25,38 @@ export const RegisterPage = () => {
   const setAuth = useAuthStore((state) => state.setAuth);
   const navigate = useNavigate();
   const language = useLanguageStore((state) => state.language);
-  const t = (key, replacements) => translate(language, `auth.register.${key}`, replacements);
-  const err = (key) => translate(language, `auth.errors.${key}`);
+  const t = (key, replacements) => {
+    const val = translate(language, `auth.register.${key}`, replacements);
+    if (val) return val;
+
+    const defaults = {
+      title: 'Create Your Account',
+      subtitle: 'Join NLR LIVE NEWS and stay informed',
+      fullName: 'Full Name',
+      email: 'Email Address',
+      password: 'Password',
+      confirmPassword: 'Confirm Password',
+      accountType: 'Account Type',
+      interests: "Select the categories you're interested in",
+      submit: 'Create Account',
+      creating: 'Creating Account...',
+      success: 'Account created successfully! Redirecting...',
+      existing: 'Already have an account?',
+      signIn: 'Sign in here'
+    };
+    return defaults[key] || '';
+  };
+  const err = (key) => {
+    const val = translate(language, `auth.errors.${key}`);
+    if (val) return val;
+    const defaults = {
+      nameRequired: 'Name must be at least 2 characters',
+      emailInvalid: 'Please enter a valid email address',
+      passwordRequired: 'Password must be at least 6 characters long',
+      passwordMismatch: 'Passwords do not match'
+    };
+    return defaults[key] || '';
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -233,8 +263,8 @@ export const RegisterPage = () => {
                   value={form.name}
                   onChange={handleChange}
                   className={`w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 transition ${errors.name
-                      ? 'border-red-300 focus:ring-red-500'
-                      : 'border-gray-300 focus:ring-primary'
+                    ? 'border-red-300 focus:ring-red-500'
+                    : 'border-gray-300 focus:ring-primary'
                     }`}
                   placeholder={language === 'te' ? 'మీ పూర్తి పేరు ఇవ్వండి' : 'Enter your full name'}
                   required
@@ -253,8 +283,8 @@ export const RegisterPage = () => {
                   value={form.email}
                   onChange={handleChange}
                   className={`w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 transition ${errors.email
-                      ? 'border-red-300 focus:ring-red-500'
-                      : 'border-gray-300 focus:ring-primary'
+                    ? 'border-red-300 focus:ring-red-500'
+                    : 'border-gray-300 focus:ring-primary'
                     }`}
                   placeholder="your.email@example.com"
                   required
@@ -272,8 +302,8 @@ export const RegisterPage = () => {
                     <label
                       key={value}
                       className={`relative flex items-start p-4 border-2 rounded-lg cursor-pointer transition ${form.role === value
-                          ? 'border-primary bg-primary/5'
-                          : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-primary bg-primary/5'
+                        : 'border-gray-200 hover:border-gray-300'
                         }`}
                     >
                       <input
@@ -285,7 +315,9 @@ export const RegisterPage = () => {
                         className="sr-only"
                       />
                       <div className="flex-1">
-                        <div className="font-semibold text-gray-900">{translate(language, `auth.register.roles.${value}.label`)}</div>
+                        <div className="font-semibold text-gray-900">
+                          {translate(language, `auth.register.roles.${value}.label`) || value.charAt(0).toUpperCase() + value.slice(1)}
+                        </div>
                         <div className="text-xs text-gray-500 mt-1">
                           {translate(language, `auth.register.roles.${value}.description`)}
                         </div>
@@ -310,8 +342,8 @@ export const RegisterPage = () => {
                     value={form.password}
                     onChange={handleChange}
                     className={`w-full border rounded-lg px-4 py-3 pr-10 focus:outline-none focus:ring-2 transition ${errors.password
-                        ? 'border-red-300 focus:ring-red-500'
-                        : 'border-gray-300 focus:ring-primary'
+                      ? 'border-red-300 focus:ring-red-500'
+                      : 'border-gray-300 focus:ring-primary'
                       }`}
                     placeholder={language === 'te' ? 'బలమైన పాస్‌వర్డ్‌ను సృష్టించండి' : 'Create a strong password'}
                     required
@@ -346,8 +378,8 @@ export const RegisterPage = () => {
                   value={form.confirmPassword}
                   onChange={handleChange}
                   className={`w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 transition ${errors.confirmPassword
-                      ? 'border-red-300 focus:ring-red-500'
-                      : 'border-gray-300 focus:ring-primary'
+                    ? 'border-red-300 focus:ring-red-500'
+                    : 'border-gray-300 focus:ring-primary'
                     }`}
                   placeholder={language === 'te' ? 'పాస్‌వర్డ్‌ని మళ్లీ నమోదు చేయండి' : 'Re-enter your password'}
                   required
@@ -365,8 +397,8 @@ export const RegisterPage = () => {
                     <label
                       key={value}
                       className={`flex items-center gap-2 p-3 border rounded-lg cursor-pointer transition ${form.categories.includes(value)
-                          ? 'border-primary bg-primary/5 text-primary'
-                          : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-primary bg-primary/5 text-primary'
+                        : 'border-gray-200 hover:border-gray-300'
                         }`}
                     >
                       <input
@@ -376,7 +408,7 @@ export const RegisterPage = () => {
                         className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
                       />
                       <span className="text-sm font-medium">
-                        {translate(language, `auth.register.categories.${value}`)}
+                        {translate(language, `auth.register.categories.${value}`) || value.charAt(0).toUpperCase() + value.slice(1)}
                       </span>
                     </label>
                   ))}

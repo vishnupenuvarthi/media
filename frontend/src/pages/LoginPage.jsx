@@ -17,7 +17,25 @@ export const LoginPage = () => {
   const location = useLocation();
   const setAuth = useAuthStore((state) => state.setAuth);
   const language = useLanguageStore((state) => state.language);
-  const t = (key, replacements) => translate(language, `auth.login.${key}`, replacements);
+  // Helper to fallback to English text if translation is missing
+  const t = (key, replacements) => {
+    const val = translate(language, `auth.login.${key}`, replacements);
+    if (val) return val;
+
+    // Fallbacks
+    const defaults = {
+      title: 'Welcome Back',
+      subtitle: 'Sign in to your NLR LIVE NEWS account',
+      email: 'Email Address',
+      password: 'Password',
+      remember: 'Remember me',
+      forgot: 'Forgot password?',
+      submit: 'Sign In',
+      noAccount: "Don't have an account?",
+      create: 'Create one now'
+    };
+    return defaults[key] || '';
+  };
   const errors = (key) => translate(language, `auth.errors.${key}`);
 
   // Check OAuth status on mount
