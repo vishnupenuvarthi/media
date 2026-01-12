@@ -48,40 +48,8 @@ export const CalendarPDFViewer = () => {
     setPageNumber(prevPageNumber => prevPageNumber + offset);
   }
 
-  // MOBILE VIEW: Return early to avoid crashing react-pdf on low memory devices
-  if (isMobile) {
-    return (
-      <div className="flex flex-col items-center justify-center w-full bg-white rounded-xl p-8 border border-gray-100 shadow-sm text-center">
-        <div className="bg-red-50 p-4 rounded-full mb-4">
-          <DocumentTextIcon className="w-12 h-12 text-primary" />
-        </div>
-        <h3 className="text-lg font-serif font-bold text-gray-900 mb-2">
-          View Calendar PDF
-        </h3>
-        <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
-          The calendar file is large (67MB). For the best experience on mobile, please download it directly.
-        </p>
-        <div className="flex flex-col gap-3 w-full sm:w-auto">
-          <a
-            href={pdfUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-primary border-2 border-primary/20 rounded-lg hover:bg-primary/5 transition-all font-semibold active:scale-95"
-          >
-            <DocumentTextIcon className="w-5 h-5" />
-            Open in Browser
-          </a>
-          <a
-            href={pdfUrl}
-            download="NLR-News-Calendar-2026.pdf"
-            className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all shadow-md active:scale-95 font-semibold"
-          >
-            <ArrowDownTrayIcon className="w-5 h-5" />
-            Download PDF
-          </a>
-        </div>
-      </div>
-    );
+  function nextPage() {
+    changePage(1);
   }
 
   return (
@@ -130,6 +98,8 @@ export const CalendarPDFViewer = () => {
           renderTextLayer={false}
           renderAnnotationLayer={false}
           width={containerWidth}
+          // CRITICAL: Force low pixel ratio on mobile to save memory (prevent crash)
+          pixelRatio={isMobile ? 1.0 : undefined}
           error={
             <div className="p-4 text-xs text-red-500 text-center">
               Page render error. Please download.
