@@ -114,10 +114,6 @@ export const LoginPage = () => {
   };
 
   return (
-// ... imports
-// (Keeping logic same, updating UI)
-
-  return (
     <div className="min-h-screen bg-[conic-gradient(at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-red-900 to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden border border-white/20">
@@ -149,7 +145,6 @@ export const LoginPage = () => {
                     const backendUrl = getBackendUrl();
                     const oauthUrl = `${backendUrl}/api/auth/google`;
                     console.log('Redirecting to Google OAuth:', oauthUrl);
-                    // Direct redirect - OAuth must go to backend, not through proxy
                     window.location.href = oauthUrl;
                   } catch (err) {
                     console.error('OAuth error:', err);
