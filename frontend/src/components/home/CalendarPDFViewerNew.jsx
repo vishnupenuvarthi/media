@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { getBackendUrl } from '@/utils/getBackendUrl';
 import { ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon, ArrowPathIcon, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -10,7 +11,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@4.4.168/buil
 
 export const CalendarPDFViewerNew = () => {
     // Debug Log
-    useEffect(() => { console.log("CalendarPDFViewerNew v700.0 iOS SAFE Loaded"); }, []);
+    useEffect(() => { console.log("CalendarPDFViewerNew v800.0 ZOOM+SWIPE Loaded"); }, []);
 
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -20,6 +21,9 @@ export const CalendarPDFViewerNew = () => {
     const [containerWidth, setContainerWidth] = useState(600);
     const [key, setKey] = useState(0);
     const [isPageLoaded, setIsPageLoaded] = useState(false); // Track if current page is done
+
+    // Zoom State
+    const [scale, setScale] = useState(1.0);
     const touchStartX = useRef(null);
 
     const pdfUrl = `${getBackendUrl()}/api/calendar/download-pdf`;
@@ -57,6 +61,7 @@ export const CalendarPDFViewerNew = () => {
         if (newPage !== pageNumber) {
             setPageNumber(newPage);
             setIsPageLoaded(false); // Reset load state for new page
+            setScale(1.0); // Reset zoom on page turn
         }
     };
 
@@ -65,7 +70,13 @@ export const CalendarPDFViewerNew = () => {
         setErrorMsg(null);
         setLoadProgress(0);
         setKey(prev => prev + 1);
+        setScale(1.0);
     };
+
+    // Zoom Handlers
+    const zoomIn = () => setScale(prev => Math.min(prev + 0.5, 3.0));
+    const zoomOut = () => setScale(prev => Math.max(prev - 0.5, 1.0));
+    const zoomReset = () => setScale(1.0);
 
     // iOS Optimization: Cap pixelRatio at 1.0 for mobile to prevent Canvas OOM
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
@@ -73,7 +84,8 @@ export const CalendarPDFViewerNew = () => {
 
     return (
         <div className="flex flex-col items-center w-full min-h-[500px] bg-gray-50/50 rounded-xl border border-gray-100 relative">
-            <div className="w-full bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden min-h-[500px] flex items-center justify-center relative touch-manipulation">
+            {/* Main Viewer Area */}
+            <div className={`w-full bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden min-h-[500px] flex items-center justify-center relative touch-manipulation transition-colors duration-300 ${scale > 1 ? 'overflow-auto cursor-grab' : 'overflow-hidden'}`}>
                 <Document
                     key={key}
                     file={pdfUrl}
@@ -129,26 +141,29 @@ export const CalendarPDFViewerNew = () => {
                     }
                     className="touch-pan-y"
                     options={options}
+                    // Swipe Handling only when NOT zoomed
                     onTouchStart={(e) => {
-                        touchStartX.current = e.changedTouches[0].screenX;
+                        if (scale === 1.0) {
+                            touchStartX.current = e.changedTouches[0].screenX;
+                        }
                     }}
                     onTouchEnd={(e) => {
-                        if (!touchStartX.current) return;
-                        const touchEndX = e.changedTouches[0].screenX;
-                        const diff = touchStartX.current - touchEndX;
-
-                        if (Math.abs(diff) > 50) {
-                            if (diff > 0) {
-                                if (pageNumber < numPages) changePage(1);
-                            } else {
-                                if (pageNumber > 1) changePage(-1);
+                        if (scale === 1.0 && touchStartX.current) {
+                            const touchEndX = e.changedTouches[0].screenX;
+                            const diff = touchStartX.current - touchEndX;
+                            if (Math.abs(diff) > 50) {
+                                if (diff > 0 && pageNumber < numPages) changePage(1);
+                                if (diff < 0 && pageNumber > 1) changePage(-1);
                             }
+                            touchStartX.current = null;
                         }
-                        touchStartX.current = null;
                     }}
                 >
-                    {/* Main Page - Always Visible */}
-                    <div className="transform-gpu will-change-transform">
+                    {/* Main Page - Zoom via CSS Transform for Performance */}
+                    <div
+                        className="transform-gpu transition-transform duration-200 ease-out origin-top"
+                        style={{ transform: `scale(${scale})` }}
+                    >
                         <Page
                             key={`page_${pageNumber}`}
                             pageNumber={pageNumber}
@@ -167,8 +182,8 @@ export const CalendarPDFViewerNew = () => {
                         />
                     </div>
 
-                    {/* DESKTOP ONLY: Pre-load NEXT page (Hidden) */}
-                    {!isMobile && pageNumber < numPages && (
+                    {/* Pre-load NEXT page (Hidden) - Only if NOT Zoomed & Desktop */}
+                    {!isMobile && scale === 1 && pageNumber < numPages && (
                         <div style={{ display: 'none' }}>
                             <Page
                                 key={`preload_next_${pageNumber + 1}`}
@@ -183,7 +198,7 @@ export const CalendarPDFViewerNew = () => {
                     )}
 
                     {/* DESKTOP ONLY: Pre-load NEXT+1 page */}
-                    {!isMobile && pageNumber + 1 < numPages && (
+                    {!isMobile && scale === 1 && pageNumber + 1 < numPages && (
                         <div style={{ display: 'none' }}>
                             <Page
                                 key={`preload_next2_${pageNumber + 2}`}
@@ -198,7 +213,7 @@ export const CalendarPDFViewerNew = () => {
                     )}
 
                     {/* DESKTOP ONLY: Pre-load PREVIOUS page */}
-                    {!isMobile && pageNumber > 1 && (
+                    {!isMobile && scale === 1 && pageNumber > 1 && (
                         <div style={{ display: 'none' }}>
                             <Page
                                 key={`preload_prev_${pageNumber - 1}`}
@@ -213,44 +228,67 @@ export const CalendarPDFViewerNew = () => {
                     )}
                 </Document>
 
-                {/* Tap Zones for easier navigation */}
-                <div className="absolute top-0 bottom-0 left-0 w-16 z-10 active:bg-black/5 transition-colors" onClick={() => changePage(-1)} />
-                <div className="absolute top-0 bottom-0 right-0 w-16 z-10 active:bg-black/5 transition-colors" onClick={() => changePage(1)} />
+                {/* Tap Zones (Only active when NOT zoomed) */}
+                {scale === 1 && (
+                    <>
+                        <div className="absolute top-0 bottom-0 left-0 w-12 z-10 active:bg-black/5 transition-colors" onClick={() => changePage(-1)} />
+                        <div className="absolute top-0 bottom-0 right-0 w-12 z-10 active:bg-black/5 transition-colors" onClick={() => changePage(1)} />
+                    </>
+                )}
             </div>
 
+            {/* Controls Bar */}
             {!loading && numPages && (
-                <div className="flex items-center justify-between w-full max-w-md mt-6 px-4 pb-0">
-                    <button
-                        onClick={() => changePage(-1)}
-                        disabled={pageNumber <= 1}
-                        className="p-4 bg-white border border-gray-200 rounded-full shadow-lg disabled:opacity-30 disabled:shadow-none active:scale-95 transition-all text-gray-700 hover:text-primary hover:border-primary/30"
-                    >
-                        <ChevronLeftIcon className="w-6 h-6" />
-                    </button>
-
-                    <div className="flex flex-col items-center">
-                        <span className="font-serif font-bold text-xl text-gray-900 tabular-nums">
-                            {pageNumber} <span className="text-gray-400 text-sm font-normal">/ {numPages}</span>
-                        </span>
-                        <div className="flex items-center gap-2 mt-1">
-                            <a
-                                href={pdfUrl}
-                                download="NLR-News-Calendar-2026.pdf"
-                                className="text-[10px] uppercase tracking-wider font-bold text-gray-500 hover:text-primary transition-colors flex items-center gap-1"
-                            >
-                                <ArrowDownTrayIcon className="w-3 h-3" /> Download PDF
-                            </a>
-                            <span className="text-[10px] text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded-full ring-1 ring-indigo-100">v700.0 iOS SAFE</span>
-                        </div>
+                <div className="w-full max-w-md px-4 pb-0 mt-4 space-y-4">
+                    {/* Scale Controls */}
+                    <div className="flex items-center justify-center gap-4 bg-white/80 backdrop-blur rounded-full px-6 py-2 shadow-sm border border-gray-100 mx-auto w-fit">
+                        <button onClick={zoomOut} className="p-2 hover:bg-gray-100 rounded-full text-gray-600 disabled:opacity-30" disabled={scale <= 1}>
+                            <MagnifyingGlassMinusIcon className="w-5 h-5" />
+                        </button>
+                        <span className="text-xs font-bold text-gray-500 w-8 text-center">{Math.round(scale * 100)}%</span>
+                        <button onClick={zoomIn} className="p-2 hover:bg-gray-100 rounded-full text-gray-600 disabled:opacity-30" disabled={scale >= 3}>
+                            <MagnifyingGlassPlusIcon className="w-5 h-5" />
+                        </button>
+                        <div className="w-px h-4 bg-gray-200 mx-1"></div>
+                        <button onClick={zoomReset} className="text-[10px] font-bold text-primary uppercase tracking-wide hover:underline">
+                            Reset
+                        </button>
                     </div>
 
-                    <button
-                        onClick={() => changePage(1)}
-                        disabled={pageNumber >= numPages}
-                        className="p-4 bg-white border border-gray-200 rounded-full shadow-lg disabled:opacity-30 disabled:shadow-none active:scale-95 transition-all text-gray-700 hover:text-primary hover:border-primary/30"
-                    >
-                        <ChevronRightIcon className="w-6 h-6" />
-                    </button>
+                    {/* Navigation Bar */}
+                    <div className="flex items-center justify-between">
+                        <button
+                            onClick={() => changePage(-1)}
+                            disabled={pageNumber <= 1}
+                            className="p-4 bg-white border border-gray-200 rounded-full shadow-lg disabled:opacity-30 disabled:shadow-none active:scale-95 transition-all text-gray-700 hover:text-primary"
+                        >
+                            <ChevronLeftIcon className="w-6 h-6" />
+                        </button>
+
+                        <div className="flex flex-col items-center">
+                            <span className="font-serif font-bold text-xl text-gray-900 tabular-nums">
+                                {pageNumber} <span className="text-gray-400 text-sm font-normal">/ {numPages}</span>
+                            </span>
+                            <div className="flex items-center gap-2 mt-1">
+                                <a
+                                    href={pdfUrl}
+                                    download="NLR-News-Calendar-2026.pdf"
+                                    className="text-[10px] uppercase tracking-wider font-bold text-gray-500 hover:text-primary transition-colors flex items-center gap-1"
+                                >
+                                    <ArrowDownTrayIcon className="w-3 h-3" /> Download PDF
+                                </a>
+                                <span className="text-[10px] text-orange-600 font-bold bg-orange-50 px-2 py-0.5 rounded-full ring-1 ring-orange-100">v800.0 ZOOM</span>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => changePage(1)}
+                            disabled={pageNumber >= numPages}
+                            className="p-4 bg-white border border-gray-200 rounded-full shadow-lg disabled:opacity-30 disabled:shadow-none active:scale-95 transition-all text-gray-700 hover:text-primary"
+                        >
+                            <ChevronRightIcon className="w-6 h-6" />
+                        </button>
+                    </div>
                 </div>
             )}
         </div>
