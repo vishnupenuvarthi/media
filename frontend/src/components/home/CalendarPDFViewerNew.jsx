@@ -12,7 +12,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 export const CalendarPDFViewerNew = () => {
     // Debug Log
-    useEffect(() => { console.log("CalendarPDFViewerNew v1500.0 REFINED Loaded"); }, []);
+    useEffect(() => { console.log("CalendarPDFViewerNew v1200.0 GHOST UI Loaded"); }, []);
 
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -182,73 +182,63 @@ export const CalendarPDFViewerNew = () => {
                                     />
                                 </TransformComponent>
 
-                                {/* Bottom Tools Dock (Zoom + Page + Download) */}
-                                {!loading && numPages && (
-                                    <div className="absolute bottom-6 left-4 right-4 z-40">
-                                        <div className="bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-3 flex items-center justify-between gap-2 max-w-md mx-auto">
-
-                                            {/* Zoom Group */}
-                                            <div className="flex items-center gap-1 bg-white/10 rounded-lg p-1">
-                                                <button onClick={() => zoomOut()} className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-md transition-all active:scale-95 disabled:opacity-30" disabled={state.scale <= 1}>
-                                                    <MagnifyingGlassMinusIcon className="w-5 h-5" />
-                                                </button>
-                                                <div className="w-px h-4 bg-white/10"></div>
-                                                <button onClick={() => zoomIn()} className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-md transition-all active:scale-95" disabled={state.scale >= 4}>
-                                                    <MagnifyingGlassPlusIcon className="w-5 h-5" />
-                                                </button>
-                                            </div>
-
-                                            {/* Page Indicator */}
-                                            <div className="flex flex-col items-center">
-                                                <span className="text-white font-bold font-mono text-sm tracking-widest">
-                                                    {pageNumber} / {numPages}
-                                                </span>
-                                                <span className="text-[9px] text-fuchsia-400 font-bold uppercase tracking-wider">
-                                                    v1500.0 REFINED
-                                                </span>
-                                            </div>
-
-                                            {/* Download & Reset */}
-                                            <div className="flex items-center gap-1">
-                                                <button onClick={() => resetTransform()} className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-md transition-all active:scale-95">
-                                                    <ArrowsPointingOutIcon className="w-5 h-5" />
-                                                </button>
-                                                <a
-                                                    href={pdfUrl}
-                                                    download="NLR-News-Calendar-2026.pdf"
-                                                    className="p-2 bg-primary/90 hover:bg-primary text-white rounded-lg shadow-lg shadow-primary/20 active:scale-95 transition-all"
-                                                >
-                                                    <ArrowDownTrayIcon className="w-5 h-5" />
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
+                                {/* Floating Zoom Controls (Transparent until interaction) */}
+                                <div className="absolute top-20 right-4 flex flex-col gap-2 z-20 opacity-60 hover:opacity-100 transition-opacity">
+                                    <button onClick={() => zoomIn()} className="p-2 bg-black/20 backdrop-blur-md border border-white/10 text-white rounded-full shadow-sm hover:bg-black/60 transition-colors">
+                                        <MagnifyingGlassPlusIcon className="w-5 h-5" />
+                                    </button>
+                                    <button onClick={() => zoomOut()} className="p-2 bg-black/20 backdrop-blur-md border border-white/10 text-white rounded-full shadow-sm hover:bg-black/60 transition-colors">
+                                        <MagnifyingGlassMinusIcon className="w-5 h-5" />
+                                    </button>
+                                    <button onClick={() => resetTransform()} className="p-2 bg-black/20 backdrop-blur-md border border-white/10 text-white rounded-full shadow-sm hover:bg-black/60 transition-colors">
+                                        <ArrowsPointingOutIcon className="w-5 h-5" />
+                                    </button>
+                                </div>
                             </div>
                         )}
                     </TransformWrapper>
                 </Document>
             </div>
 
-            {/* Side Navigation Arrows (Ghost Mode) - Vertically Centered, Smaller & More Transparent */}
+            {/* Top Right Download Button (Transparent) */}
+            {!loading && (
+                <a
+                    href={pdfUrl}
+                    download="NLR-News-Calendar-2026.pdf"
+                    className="absolute top-4 right-4 z-40 p-3 bg-white/30 backdrop-blur-md border border-white/20 rounded-full shadow-sm text-gray-700 hover:bg-white/90 hover:text-primary active:scale-95 transition-all opacity-70 hover:opacity-100"
+                >
+                    <ArrowDownTrayIcon className="w-5 h-5" />
+                </a>
+            )}
+
+            {/* Modern Floating Navigation Pill (Transparent) */}
             {!loading && numPages && (
-                <>
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 bg-white/60 backdrop-blur-sm border border-white/20 shadow-lg rounded-full px-2 py-2 pr-6 hover:bg-white/90 hover:shadow-2xl transition-all duration-300 group">
                     <button
                         onClick={() => changePage(-1)}
                         disabled={pageNumber <= 1}
-                        className="absolute top-1/2 left-2 -translate-y-1/2 z-30 p-2 bg-black/10 hover:bg-black/40 backdrop-blur-[2px] rounded-full text-white/70 hover:text-white transition-all disabled:opacity-0 active:scale-90 opacity-40 hover:opacity-100"
+                        className="w-10 h-10 flex items-center justify-center bg-white/50 hover:bg-white rounded-full text-gray-700 disabled:opacity-30 active:scale-90 transition-all shadow-sm"
                     >
-                        <ChevronLeftIcon className="w-6 h-6" />
+                        <ChevronLeftIcon className="w-5 h-5" />
                     </button>
+
+                    <div className="flex flex-col items-center min-w-[80px]">
+                        <span className="font-bold text-gray-900 text-sm drop-shadow-sm">
+                            {pageNumber} <span className="text-gray-600 font-normal">/ {numPages}</span>
+                        </span>
+                        <span className="text-[9px] text-fuchsia-600 font-bold uppercase tracking-wider opacity-60 group-hover:opacity-100 transition-opacity">
+                            v1200.0 GHOST
+                        </span>
+                    </div>
 
                     <button
                         onClick={() => changePage(1)}
                         disabled={pageNumber >= numPages}
-                        className="absolute top-1/2 right-2 -translate-y-1/2 z-30 p-2 bg-black/10 hover:bg-black/40 backdrop-blur-[2px] rounded-full text-white/70 hover:text-white transition-all disabled:opacity-0 active:scale-90 opacity-40 hover:opacity-100"
+                        className="w-10 h-10 flex items-center justify-center bg-black/80 text-white hover:bg-black rounded-full shadow-lg disabled:opacity-30 disabled:shadow-none active:scale-90 transition-all"
                     >
-                        <ChevronRightIcon className="w-6 h-6" />
+                        <ChevronRightIcon className="w-5 h-5" />
                     </button>
-                </>
+                </div>
             )}
         </div>
     );
