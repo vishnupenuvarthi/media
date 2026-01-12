@@ -26,7 +26,7 @@ const slideStyles = `
 
 export const CalendarPDFViewerNew = () => {
     // Debug Log
-    useEffect(() => { console.log("CalendarPDFViewerNew v1400.0 SLIDE UI Loaded"); }, []);
+    useEffect(() => { console.log("CalendarPDFViewerNew v1500.0 FINAL POLISH Loaded"); }, []);
 
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
@@ -248,29 +248,25 @@ export const CalendarPDFViewerNew = () => {
                 )}
             </div>
 
-            {/* Bottom Info & Download (Minimal) */}
+            {/* Bottom Floating Control Dock */}
             {!loading && numPages && (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 bg-black/50 backdrop-blur-md text-white rounded-full px-4 py-1.5 shadow-lg border border-white/10">
-                    <span className="font-medium text-xs tracking-wide">
-                        {pageNumber} / {numPages}
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 bg-gray-900/80 backdrop-blur-md text-white rounded-full px-6 py-3 shadow-2xl border border-white/10 transition-all hover:bg-gray-900/90 hover:scale-105">
+                    <span className="font-serif text-sm tracking-widest text-gray-300 border-r border-white/20 pr-4 mr-1">
+                        {pageNumber} <span className="text-gray-500">/</span> {numPages}
                     </span>
-                    <div className="w-px h-3 bg-white/30"></div>
+
                     <a
                         href={pdfUrl}
                         download="NLR-News-Calendar-2026.pdf"
-                        className="flex items-center gap-1.5 hover:text-primary transition-colors"
+                        className="flex items-center gap-2 text-white hover:text-primary transition-colors group"
                     >
-                        <ArrowDownTrayIcon className="w-3.5 h-3.5" />
-                        <span className="text-[10px] uppercase font-bold tracking-wider">Download</span>
+                        <div className="p-1 bg-white/10 rounded-full group-hover:bg-primary group-hover:text-white transition-colors">
+                            <ArrowDownTrayIcon className="w-4 h-4" />
+                        </div>
+                        <span className="text-xs font-bold uppercase tracking-wider">Download</span>
                     </a>
                 </div>
             )}
-
-            <div className="absolute top-2 left-4 z-20">
-                <span className="text-[9px] text-fuchsia-600 font-bold uppercase tracking-wider bg-white/80 backdrop-blur px-2 py-0.5 rounded-md shadow-sm">
-                    v1400.0 SLIDE UI
-                </span>
-            </div>
         </div>
     );
 };
