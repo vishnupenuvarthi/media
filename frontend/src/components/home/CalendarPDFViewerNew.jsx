@@ -5,11 +5,8 @@ import { ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon, MagnifyingGlassMi
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-// FIX: Use LOCAL worker to avoid network/CORS issues.
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-    'pdfjs-dist/build/pdf.worker.min.mjs',
-    import.meta.url,
-).toString();
+// FIX: Use CDN worker to avoid local build/MIME issues on mobile
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.mjs`;
 
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
@@ -40,6 +37,7 @@ export const CalendarPDFViewerNew = () => {
     const [key, setKey] = useState(0);
     const [slideDirection, setSlideDirection] = useState('right'); // 'right' or 'left'
     const [scale, setScale] = useState(1); // Track scale to toggle panning
+    const [errorMsg, setErrorMsg] = useState(null); // Track specific error
 
     // Swipe Refs
     const touchStartX = useRef(null);
@@ -60,6 +58,7 @@ export const CalendarPDFViewerNew = () => {
     function onDocumentLoadSuccess({ numPages }) {
         setNumPages(numPages);
         setLoading(false);
+        setErrorMsg(null);
     }
 
     // Restored to fix undefined error
@@ -87,6 +86,7 @@ export const CalendarPDFViewerNew = () => {
 
     const handleRetry = () => {
         setLoading(true);
+        setErrorMsg(null);
         setLoadProgress(0);
         setKey(prev => prev + 1);
         setScale(1);
@@ -119,6 +119,7 @@ export const CalendarPDFViewerNew = () => {
                     }}
                     onLoadError={(err) => {
                         console.error("PDF Load Error:", err);
+                        setErrorMsg(err.message || "Unknown Error");
                         setLoading(false);
                     }}
                     loading={
@@ -133,7 +134,10 @@ export const CalendarPDFViewerNew = () => {
                                 <ArrowDownTrayIcon className="w-8 h-8 text-red-500" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-2">Viewer Limitation</h3>
+                                <h3 className="text-lg font-bold text-gray-900 mb-2">Viewer Error</h3>
+                                <p className="text-sm text-red-500 font-mono bg-red-50 p-2 rounded mb-4 break-words">
+                                    {errorMsg || "Failed to load PDF."}
+                                </p>
                                 <p className="text-sm text-gray-500 leading-relaxed mb-4">
                                     Tap below to open in native viewer.
                                 </p>
