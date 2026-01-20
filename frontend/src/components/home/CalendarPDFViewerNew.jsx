@@ -31,7 +31,7 @@ export const CalendarPDFViewerNew = () => {
     // Debug Log
     useEffect(() => { console.log("CalendarPDFViewerNew vOptimization Loaded"); }, []);
 
-    const [isViewerOpen, setIsViewerOpen] = useState(false);
+
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
     const [loading, setLoading] = useState(true);
@@ -70,8 +70,8 @@ export const CalendarPDFViewerNew = () => {
     const options = useMemo(() => ({
         cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/cmaps/',
         cMapPacked: true,
-        disableAutoFetch: false, // ALLOW streaming!
-        disableStream: false,    // ALLOW streaming!
+        disableAutoFetch: true, // IMPORTANT: Don't download 70MB file automatically
+        disableStream: true,    // IMPORTANT: Enable range requests for random access
         disableFontFace: true,
     }), []);
 
@@ -95,40 +95,6 @@ export const CalendarPDFViewerNew = () => {
     // iOS Optimization: Cap pixelRatio at 1.0 for mobile to prevent Canvas OOM
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     const pixelRatio = isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.5);
-
-    if (!isViewerOpen) {
-        return (
-            <div className="w-full h-[500px] bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 flex flex-col items-center justify-center p-6 text-center relative overflow-hidden group">
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
-
-                <div className="z-10 bg-white p-6 rounded-2xl shadow-xl shadow-gray-200/50 mb-6 transform transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-1">
-                    <CalendarDaysIcon className="w-16 h-16 text-primary mx-auto mb-3" />
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">2026 Calendar</h3>
-                    <p className="text-sm text-gray-500">PDF Edition</p>
-                </div>
-
-                <div className="z-10 flex flex-col gap-3 w-full max-w-xs">
-                    <button
-                        onClick={() => setIsViewerOpen(true)}
-                        className="w-full py-3.5 bg-gray-900 hover:bg-black text-white rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95"
-                    >
-                        <EyeIcon className="w-5 h-5" />
-                        View Calendar
-                    </button>
-                    <a
-                        href={pdfUrl}
-                        download="NLR-News-Calendar-2026.pdf"
-                        className="w-full py-3.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
-                    >
-                        <ArrowDownTrayIcon className="w-5 h-5" />
-                        Download PDF (67MB)
-                    </a>
-                </div>
-
-                <p className="z-10 text-xs text-gray-400 mt-6">Tap "View Calendar" to load interactive viewer</p>
-            </div>
-        )
-    }
 
     return (
         <div
@@ -156,15 +122,9 @@ export const CalendarPDFViewerNew = () => {
                         setLoading(false);
                     }}
                     loading={
-                        <div className="flex flex-col items-center gap-4 p-10">
-                            <div className="relative w-16 h-16">
-                                <div className="absolute inset-0 border-4 border-gray-100 rounded-full"></div>
-                                <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                            </div>
-                            <div className="text-center">
-                                <p className="text-sm font-bold text-gray-900">Loading Calendar...</p>
-                                <p className="text-xs text-gray-500 mt-1">{loadProgress}% Downloaded</p>
-                            </div>
+                        <div className="flex flex-col items-center justify-center h-[600px] w-full bg-gray-50 animate-pulse rounded-lg">
+                            <CalendarDaysIcon className="w-16 h-16 text-gray-300 mb-4" />
+                            <p className="text-sm font-medium text-gray-400">Loading Calendar...</p>
                         </div>
                     }
                     error={
