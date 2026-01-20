@@ -8,7 +8,7 @@ const start = async () => {
   connectDb().catch((err) => {
     console.error('Database connection initialization error:', err);
   });
-  
+
   // Start news aggregation scheduler only if DB is connected
   if (env.nodeEnv !== 'test') {
     // Wait a bit for DB connection, then start scheduler
@@ -20,12 +20,24 @@ const start = async () => {
       }
     }, 2000);
   }
-  
+
   const port = env.port || process.env.PORT || 5000;
-  app.listen(port, '0.0.0.0', () => {
+  const server = app.listen(port, '0.0.0.0', () => {
     console.log(`🚀 Server running on port ${port}`);
     if (!isDbConnected()) {
       console.warn('⚠️  Server started but database is not connected. Some features may not work.');
+    }
+  });
+
+  // Handle server errors gracefully (like port in use)
+  server.on('error', (e) => {
+    if (e.code === 'EADDRINUSE') {
+      console.error(`❌ Port ${port} is already in use.`);
+      console.error(`👉 Please stop the other process running on port ${port} or use a different port.`);
+      process.exit(1);
+    } else {
+      console.error('Server error:', e);
+      throw e;
     }
   });
 };
