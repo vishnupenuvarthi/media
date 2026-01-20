@@ -6,9 +6,13 @@ import { ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon, ArrowPathIcon } f
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-// CRITICAL FIX: Use LOCAL worker (v4.8.69) to avoid CORS issues.
+// CRITICAL FIX: Use LOCAL worker (v4.4.168) to avoid CORS issues.
 // CDN workers often get blocked for Range Requests on large files.
-pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
+
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url,
+).toString();
 
 export const CalendarPDFViewer = () => {
   // Debug Log to confirm version loaded
@@ -42,7 +46,7 @@ export const CalendarPDFViewer = () => {
 
   // Pre-calculate options to avoid re-renders
   const options = useMemo(() => ({
-    cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.8.69/cmaps/',
+    cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/cmaps/',
     cMapPacked: true,
     disableAutoFetch: true, // Only fetch what's needed (Vital for 67MB file)
     disableStream: true,    // Reduce memory overhead
