@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { getBackendUrl } from '@/utils/getBackendUrl';
 import { ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, ArrowsPointingOutIcon, CalendarDaysIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { NLRLoader } from '@/components/common/NLRLoader';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -122,12 +123,7 @@ export const CalendarPDFViewerNew = () => {
                         setErrorMsg(err.message || "Unknown Error");
                         setLoading(false);
                     }}
-                    loading={
-                        <div className="flex flex-col items-center justify-center h-[600px] w-full bg-gray-50 animate-pulse rounded-lg">
-                            <CalendarDaysIcon className="w-16 h-16 text-gray-300 mb-4" />
-                            <p className="text-sm font-medium text-gray-400">Loading Calendar...</p>
-                        </div>
-                    }
+                    loading={<NLRLoader text={`Downloading ${loadProgress}%`} />}
                     error={
                         <div className="flex flex-col items-center gap-6 p-10 text-center px-4 max-w-sm mx-auto">
                             <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mb-2">
@@ -221,6 +217,19 @@ export const CalendarPDFViewerNew = () => {
                             </div>
                         )}
                     </TransformWrapper>
+
+                    {/* PREFETCH NEXT PAGE (Hidden) */}
+                    {pageNumber < numPages && (
+                        <div style={{ display: 'none' }}>
+                            <Page
+                                pageNumber={pageNumber + 1}
+                                width={containerWidth}
+                                renderTextLayer={false}
+                                renderAnnotationLayer={false}
+                                pixelRatio={isMobile ? 0.5 : 1} // Low res prefetch
+                            />
+                        </div>
+                    )}
                 </Document>
 
                 {/* SIDE NAVIGATION (Carousel Style) */}
