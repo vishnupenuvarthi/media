@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { getBackendUrl } from '@/utils/getBackendUrl';
-import { ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, ArrowsPointingOutIcon } from '@heroicons/react/24/outline';
+import { ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon, ArrowsPointingOutIcon, CalendarDaysIcon, EyeIcon } from '@heroicons/react/24/outline';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 // FIX: Use LOCAL worker to avoid network/CORS issues.
-pdfjs.GlobalWorkerOptions.workerSrc = `/pdf.worker.min.mjs`;
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+    'pdfjs-dist/build/pdf.worker.min.mjs',
+    import.meta.url,
+).toString();
 
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
@@ -26,8 +29,9 @@ const slideStyles = `
 
 export const CalendarPDFViewerNew = () => {
     // Debug Log
-    useEffect(() => { console.log("CalendarPDFViewerNew v1500.0 FINAL POLISH Loaded"); }, []);
+    useEffect(() => { console.log("CalendarPDFViewerNew vOptimization Loaded"); }, []);
 
+    const [isViewerOpen, setIsViewerOpen] = useState(false);
     const [numPages, setNumPages] = useState(null);
     const [pageNumber, setPageNumber] = useState(1);
     const [loading, setLoading] = useState(true);
@@ -66,8 +70,8 @@ export const CalendarPDFViewerNew = () => {
     const options = useMemo(() => ({
         cMapUrl: 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/cmaps/',
         cMapPacked: true,
-        disableAutoFetch: true,
-        disableStream: true,
+        disableAutoFetch: false, // ALLOW streaming!
+        disableStream: false,    // ALLOW streaming!
         disableFontFace: true,
     }), []);
 
@@ -91,6 +95,40 @@ export const CalendarPDFViewerNew = () => {
     // iOS Optimization: Cap pixelRatio at 1.0 for mobile to prevent Canvas OOM
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
     const pixelRatio = isMobile ? 1.0 : Math.min(window.devicePixelRatio, 1.5);
+
+    if (!isViewerOpen) {
+        return (
+            <div className="w-full h-[500px] bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 flex flex-col items-center justify-center p-6 text-center relative overflow-hidden group">
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]"></div>
+
+                <div className="z-10 bg-white p-6 rounded-2xl shadow-xl shadow-gray-200/50 mb-6 transform transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-1">
+                    <CalendarDaysIcon className="w-16 h-16 text-primary mx-auto mb-3" />
+                    <h3 className="text-xl font-bold text-gray-900 mb-1">2026 Calendar</h3>
+                    <p className="text-sm text-gray-500">PDF Edition</p>
+                </div>
+
+                <div className="z-10 flex flex-col gap-3 w-full max-w-xs">
+                    <button
+                        onClick={() => setIsViewerOpen(true)}
+                        className="w-full py-3.5 bg-gray-900 hover:bg-black text-white rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95"
+                    >
+                        <EyeIcon className="w-5 h-5" />
+                        View Calendar
+                    </button>
+                    <a
+                        href={pdfUrl}
+                        download="NLR-News-Calendar-2026.pdf"
+                        className="w-full py-3.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
+                    >
+                        <ArrowDownTrayIcon className="w-5 h-5" />
+                        Download PDF (67MB)
+                    </a>
+                </div>
+
+                <p className="z-10 text-xs text-gray-400 mt-6">Tap "View Calendar" to load interactive viewer</p>
+            </div>
+        )
+    }
 
     return (
         <div
