@@ -45,7 +45,7 @@ export const getHomeFeed = asyncHandler(async (req, res) => {
 
     // Get language from query or default to Telugu
     const language = req.query.lang === 'en' ? 'en' : 'te';
-    
+
     const sectionSlugs = ['india', 'world', 'business', 'markets', 'tech', 'sports', 'entertainment', 'lifestyle', 'opinion'];
 
     const [hero, sections, latest, trending, categorySections, calendarEvents, youtubeVideos] = await Promise.all([
@@ -65,11 +65,11 @@ export const getHomeFeed = asyncHandler(async (req, res) => {
               console.error(`Error fetching articles for ${slug}:`, err.message);
               return [];
             });
-            
+
             if (stories.length === 0) {
               console.warn(`No articles found for category ${slug}`);
             }
-            
+
             return {
               slug,
               category: {
@@ -116,7 +116,7 @@ export const getHomeFeed = asyncHandler(async (req, res) => {
 
     // Filter out breaking news from hero section
     const nonBreakingHero = (hero || []).filter(a => !(a.flags && a.flags.isBreaking === true));
-    
+
     const heroFormatted = nonBreakingHero.slice(0, 8).map((article) => ({
       id: article._id.toString(),
       title: article.title,
@@ -135,22 +135,22 @@ export const getHomeFeed = asyncHandler(async (req, res) => {
       const categoryArticles = [...(hero || []), ...(latest || [])]
         .filter((article) => {
           if (!article.category) return false;
-          
+
           // Exclude breaking news
           if (article.flags && article.flags.isBreaking === true) {
             return false;
           }
-          
+
           // Handle both populated and unpopulated category references
-          const articleCatId = article.category?._id 
-            ? article.category._id.toString() 
+          const articleCatId = article.category?._id
+            ? article.category._id.toString()
             : article.category.toString();
           const categoryId = category._id.toString();
-          
+
           return articleCatId === categoryId;
         })
         .slice(0, 4);
-      
+
       return {
         category: {
           id: category._id.toString(),
@@ -165,7 +165,7 @@ export const getHomeFeed = asyncHandler(async (req, res) => {
     // Filter out breaking news from latest and trending
     const nonBreakingLatest = (latest || []).filter(a => !(a.flags && a.flags.isBreaking === true));
     const nonBreakingTrending = (trending || []).filter(a => !(a.flags && a.flags.isBreaking === true));
-    
+
     res.json({
       hero: heroFormatted,
       sections: sectionPayload,
@@ -196,6 +196,17 @@ export const getHomeFeed = asyncHandler(async (req, res) => {
       calendar: [],
       youtube: []
     });
+  }
+});
+
+
+export const getYouTubeFeed = asyncHandler(async (req, res) => {
+  try {
+    const videos = await YouTubeService.getChannelVideos({ channelHandle: '@chinnap9430', limit: 30 }); // Increased limit for dedicated page
+    res.json(videos || []);
+  } catch (err) {
+    console.error('Error fetching YouTube feed:', err.message);
+    res.status(500).json([]);
   }
 });
 

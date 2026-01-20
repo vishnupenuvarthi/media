@@ -3,33 +3,24 @@ import { api } from '@/lib/api';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { translate } from '@/utils/translator';
 import { PlayCircleIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
+import { NLRLoader } from '@/components/common/NLRLoader';
 import dayjs from '@/utils/dayjs';
 
 export const YouTubePage = () => {
   const language = useLanguageStore((state) => state.language);
   const t = (key) => translate(language, `youtube.${key}`);
-  
+
   const { data: videos, isLoading, error } = useQuery({
-    queryKey: ['youtube-videos'],
+    queryKey: ['youtube-videos-full'],
     queryFn: async () => {
-      const { data } = await api.get('/home?lang=' + language);
-      return data.youtube || [];
+      // Optimized: Fetch ONLY youtube videos, not the whole home feed
+      const { data } = await api.get('/home/youtube');
+      return data || [];
     }
   });
 
   if (isLoading) {
-    return (
-      <div className="max-w-6xl mx-auto px-4 py-12">
-        <div className="animate-pulse space-y-6">
-          <div className="h-12 bg-gray-200 rounded w-1/3" />
-          <div className="grid md:grid-cols-3 gap-6">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-48 bg-gray-100 rounded-xl" />
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <NLRLoader text="Loading Videos..." />;
   }
 
   if (error || !videos || videos.length === 0) {
@@ -142,8 +133,8 @@ export const YouTubePage = () => {
                 <PlayCircleIcon className="w-12 h-12 text-white" />
               </div>
               <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                  YouTube
-                </div>
+                YouTube
+              </div>
             </div>
             <div className="p-4">
               <h3 className="font-semibold text-lg leading-tight line-clamp-2 group-hover:text-red-600 transition mb-2">
